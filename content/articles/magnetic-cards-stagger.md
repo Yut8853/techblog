@@ -73,16 +73,16 @@ files:
         }
 
         const cards = [
-          { label: '企画', text: 'アイデアを整理しながら流れを見せるカード' },
-          { label: '演出', text: '登場とホバーで印象を切り替えるカード' },
-          { label: '導線', text: 'CTA の手前で目線を整えるためのカード' },
+          { label: 'JUNKBRANDING', text: 'テキストテキスト、、、、' },
+          { label: 'JUNKBRANDING', text: 'テキストテキスト、、、、' },
+          { label: 'JUNKBRANDING', text: 'テキストテキスト、、、、' },
         ]
 
         return (
           <section className="magnetic-board" ref={sectionRef}>
             <div className="magnetic-copy">
-              <p className="magnetic-label">Stagger + Magnetic</p>
-              <h1>並びで見せて、触れて反応させる。</h1>
+              <p className="magnetic-label">テキストテキスト、、、、</p>
+              <h1>JUNKBRANDING</h1>
             </div>
             <div className="magnetic-grid">
               {cards.map((card, index) => (
@@ -229,16 +229,16 @@ code:
       }
 
       const cards = [
-        { label: '企画', text: 'アイデアを整理しながら流れを見せるカード' },
-        { label: '演出', text: '登場とホバーで印象を切り替えるカード' },
-        { label: '導線', text: 'CTA の手前で目線を整えるためのカード' },
+        { label: 'JUNKBRANDING', text: 'テキストテキスト、、、、' },
+        { label: 'JUNKBRANDING', text: 'テキストテキスト、、、、' },
+        { label: 'JUNKBRANDING', text: 'テキストテキスト、、、、' },
       ]
 
       return (
         <section className="magnetic-board" ref={sectionRef}>
           <div className="magnetic-copy">
-            <p className="magnetic-label">Stagger + Magnetic</p>
-            <h1>並びで見せて、触れて反応させる。</h1>
+            <p className="magnetic-label">テキストテキスト、、、、</p>
+            <h1>JUNKBRANDING</h1>
           </div>
           <div className="magnetic-grid">
             {cards.map((card, index) => (

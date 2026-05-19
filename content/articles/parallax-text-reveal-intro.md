@@ -73,15 +73,15 @@ files:
               <div className="intro-layer intro-layer-back" ref={backRef} />
               <div className="intro-layer intro-layer-mid" ref={midRef} />
               <div className="intro-copy">
-                <p className="intro-label">Parallax + Text</p>
-                <h1 className="intro-title" ref={titleRef}>奥行きのある導入で、最初の一瞬をつくる。</h1>
+                <p className="intro-label">テキストテキスト、、、、</p>
+                <h1 className="intro-title" ref={titleRef}>JUNKBRANDING</h1>
                 <p className="intro-description" ref={copyRef}>
-                  背景の速度差と見出しの出るタイミングをずらして、静かなのに印象が残る導入にしています。
+                  テキストテキスト、、、、
                 </p>
               </div>
             </section>
             <section className="intro-panel">
-              <p>スクロールすると、背景の動きと見出しの抜け方の差が少しずつ見えてきます。</p>
+              <p>テキストテキスト、、、、</p>
             </section>
           </div>
         )
@@ -230,15 +230,15 @@ code:
             <div className="intro-layer intro-layer-back" ref={backRef} />
             <div className="intro-layer intro-layer-mid" ref={midRef} />
             <div className="intro-copy">
-              <p className="intro-label">Parallax + Text</p>
-              <h1 className="intro-title" ref={titleRef}>奥行きのある導入で、最初の一瞬をつくる。</h1>
+              <p className="intro-label">テキストテキスト、、、、</p>
+              <h1 className="intro-title" ref={titleRef}>JUNKBRANDING</h1>
               <p className="intro-description" ref={copyRef}>
-                背景の速度差と見出しの出るタイミングをずらして、静かなのに印象が残る導入にしています。
+                テキストテキスト、、、、
               </p>
             </div>
           </section>
           <section className="intro-panel">
-            <p>スクロールすると、背景の動きと見出しの抜け方の差が少しずつ見えてきます。</p>
+            <p>テキストテキスト、、、、</p>
           </section>
         </div>
       )

@@ -62,9 +62,9 @@ files:
           <section className="cursor-lab">
             <div ref={cursorRef} className="cursor-orb" />
             <div className="cursor-copy">
-              <p className="cursor-label">Cursor + Magnet</p>
-              <h1>カーソルの動きまで、気持ちよくする。</h1>
-              <p>近づいたときに少し吸い付く動きを入れるだけで、ボタンの触り心地が変わります。</p>
+              <p className="cursor-label">テキストテキスト、、、、</p>
+              <h1>JUNKBRANDING</h1>
+              <p>テキストテキスト、、、、</p>
               <button
                 ref={buttonRef}
                 className="cursor-button"
@@ -192,9 +192,9 @@ code:
         <section className="cursor-lab">
           <div ref={cursorRef} className="cursor-orb" />
           <div className="cursor-copy">
-            <p className="cursor-label">Cursor + Magnet</p>
-            <h1>カーソルの動きまで、気持ちよくする。</h1>
-            <p>近づいたときに少し吸い付く動きを入れるだけで、ボタンの触り心地が変わります。</p>
+            <p className="cursor-label">テキストテキスト、、、、</p>
+            <h1>JUNKBRANDING</h1>
+            <p>テキストテキスト、、、、</p>
             <button
               ref={buttonRef}
               className="cursor-button"

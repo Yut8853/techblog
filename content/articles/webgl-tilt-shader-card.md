@@ -55,9 +55,9 @@ files:
               onMouseLeave={handleLeave}
             >
               <div className="shader-noise" />
-                <p className="shader-label">Tilt + Glow</p>
-                <h1>光が面に追いつくように動かす。</h1>
-                <p className="shader-copy">発光の位置とチルトを一緒に動かし、奥行きがあるように見せています。</p>
+                <p className="shader-label">テキストテキスト、、、、</p>
+                <h1>JUNKBRANDING</h1>
+                <p className="shader-copy">テキストテキスト、、、、</p>
             </div>
           </section>
         )
@@ -172,9 +172,9 @@ code:
             onMouseLeave={handleLeave}
           >
             <div className="shader-noise" />
-              <p className="shader-label">Tilt + Glow</p>
-              <h1>光が面に追いつくように動かす。</h1>
-              <p className="shader-copy">発光の位置とチルトを一緒に動かし、奥行きがあるように見せています。</p>
+              <p className="shader-label">テキストテキスト、、、、</p>
+              <h1>JUNKBRANDING</h1>
+              <p className="shader-copy">テキストテキスト、、、、</p>
           </div>
         </section>
       )

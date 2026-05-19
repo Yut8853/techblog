@@ -61,7 +61,7 @@ files:
 
         return (
           <section className="split-wave-stage">
-            <p className="split-wave-label">Split Text + Gradient</p>
+            <p className="split-wave-label">テキストテキスト、、、、</p>
             <h1 className="split-wave-title" aria-label={text}>
               {text.split('').map((char, index) => (
                 <span
@@ -76,7 +76,7 @@ files:
               ))}
             </h1>
             <div ref={lineRef} className="split-wave-line" />
-            <p className="split-wave-copy">文字が順番に立ち上がったあと、少しだけ揺れを残して表情をつけています。</p>
+            <p className="split-wave-copy">テキストテキスト、、、、</p>
           </section>
         )
       }
@@ -176,7 +176,7 @@ code:
 
       return (
         <section className="split-wave-stage">
-          <p className="split-wave-label">Split Text + Gradient</p>
+          <p className="split-wave-label">テキストテキスト、、、、</p>
           <h1 className="split-wave-title" aria-label={text}>
             {text.split('').map((char, index) => (
               <span
@@ -191,7 +191,7 @@ code:
             ))}
           </h1>
           <div ref={lineRef} className="split-wave-line" />
-          <p className="split-wave-copy">文字が順番に立ち上がったあと、少しだけ揺れを残して表情をつけています。</p>
+          <p className="split-wave-copy">テキストテキスト、、、、</p>
         </section>
       )
     }

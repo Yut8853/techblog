@@ -40,8 +40,8 @@ const defaultCode: ArticleCode = {
   jsx: `function Hero() {
   return (
     <div className="hero">
-      <h1 className="hero-title">流れに合わせて、印象を立ち上げる。</h1>
-      <p className="hero-subtitle">スクロールに合わせて見出しと背景の動きをずらし、導入にゆっくりリズムをつくります。</p>
+      <h1 className="hero-title">JUNKBRANDING</h1>
+      <p className="hero-subtitle">テキストテキスト、、、、</p>
     </div>
   )
 }`,

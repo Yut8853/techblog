@@ -72,14 +72,14 @@ files:
                   />
                 ))}
               </div>
-              <p>Loading the next mood...</p>
+              <p>テキストテキスト、、、、</p>
             </div>
 
             <div className="orb-panel" ref={panelRef}>
-              <p className="orb-label">Loading Transition</p>
-              <h1>待ち時間を、そのまま次の画面につなぐ。</h1>
+              <p className="orb-label">テキストテキスト、、、、</p>
+              <h1>JUNKBRANDING</h1>
               <p className="orb-copy">
-                粒子が集まる動きをローディングで終わらせず、そのまま次の表示へつなげています。
+                テキストテキスト、、、、
               </p>
             </div>
           </section>
@@ -228,14 +228,14 @@ code:
                 />
               ))}
             </div>
-            <p>Loading the next mood...</p>
+            <p>テキストテキスト、、、、</p>
           </div>
 
           <div className="orb-panel" ref={panelRef}>
-            <p className="orb-label">Loading Transition</p>
-            <h1>待ち時間を、そのまま次の画面につなぐ。</h1>
+            <p className="orb-label">テキストテキスト、、、、</p>
+            <h1>JUNKBRANDING</h1>
             <p className="orb-copy">
-              粒子が集まる動きをローディングで終わらせず、そのまま次の表示へつなげています。
+              テキストテキスト、、、、
             </p>
           </div>
         </section>

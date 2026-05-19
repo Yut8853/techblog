@@ -24,8 +24,8 @@ files:
         const contentRef = React.useRef(null)
 
         const pages = [
-          { eyebrow: 'Scene 01', title: '静かな導入', copy: '最初の画面は情報を絞り、切り替わる瞬間だけ印象を強めています。', theme: 'theme-a' },
-          { eyebrow: 'Scene 02', title: '次の内容へ切り替え', copy: 'マスクが広がるタイミングで次の情報を滑り込ませ、流れを切らさないようにしています。', theme: 'theme-b' },
+          { eyebrow: 'テキストテキスト、、、、', title: 'JUNKBRANDING', copy: 'テキストテキスト、、、、', theme: 'theme-a' },
+          { eyebrow: 'テキストテキスト、、、、', title: 'JUNKBRANDING', copy: 'テキストテキスト、、、、', theme: 'theme-b' },
         ]
 
         const handleSwitch = () => {
@@ -155,8 +155,8 @@ code:
       const contentRef = React.useRef(null)
 
       const pages = [
-        { eyebrow: 'Scene 01', title: '静かな導入', copy: '最初の画面は情報を絞り、切り替わる瞬間だけ印象を強めています。', theme: 'theme-a' },
-        { eyebrow: 'Scene 02', title: '次の内容へ切り替え', copy: 'マスクが広がるタイミングで次の情報を滑り込ませ、流れを切らさないようにしています。', theme: 'theme-b' },
+        { eyebrow: 'テキストテキスト、、、、', title: 'JUNKBRANDING', copy: 'テキストテキスト、、、、', theme: 'theme-a' },
+        { eyebrow: 'テキストテキスト、、、、', title: 'JUNKBRANDING', copy: 'テキストテキスト、、、、', theme: 'theme-b' },
       ]
 
       const handleSwitch = () => {
