@@ -25,8 +25,7 @@ export function Footer() {
               クリエイティブな表現とテクノロジーの可能性を探求するブログです。アニメーションやインタラクションの実装方法を発信しています。
             </p>
             <p className="mt-4 text-sm text-muted-foreground">
-              運営元:
-              {' '}
+              運営元:{' '}
               <Link
                 href={operator.url}
                 target="_blank"
@@ -185,8 +184,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
           <p className="text-sm text-muted-foreground">
-            © 2026 Creative Dev Blog / Operated by
-            {' '}
+            © 2026 Creative Dev Blog / Operated by{' '}
             <Link
               href={operator.url}
               target="_blank"

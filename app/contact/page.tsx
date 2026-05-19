@@ -28,7 +28,9 @@ export default function ContactPage() {
 
           <div className="mt-10 grid gap-4 md:grid-cols-3">
             <div className="rounded-2xl border border-border/60 bg-background/80 p-6 md:col-span-3">
-              <p className="text-sm font-medium text-muted-foreground">メール</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                メール
+              </p>
               <Link
                 href={`mailto:${contact.email}`}
                 className="mt-3 block text-xl font-semibold text-blue-600 hover:underline md:text-2xl"
@@ -49,10 +51,14 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">X</p>
-                  <p className="text-base font-semibold text-foreground">@{author.username}</p>
+                  <p className="text-base font-semibold text-foreground">
+                    @{author.username}
+                  </p>
                 </div>
               </div>
-              <p className="mt-4 break-all text-sm text-blue-600">{author.social.twitter}</p>
+              <p className="mt-4 break-all text-sm text-blue-600">
+                {author.social.twitter}
+              </p>
             </Link>
 
             <Link
@@ -66,11 +72,17 @@ export default function ContactPage() {
                   <Github className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">GitHub</p>
-                  <p className="text-base font-semibold text-foreground">Yut8853</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    GitHub
+                  </p>
+                  <p className="text-base font-semibold text-foreground">
+                    Yut8853
+                  </p>
                 </div>
               </div>
-              <p className="mt-4 break-all text-sm text-blue-600">{author.social.github}</p>
+              <p className="mt-4 break-all text-sm text-blue-600">
+                {author.social.github}
+              </p>
             </Link>
           </div>
         </div>

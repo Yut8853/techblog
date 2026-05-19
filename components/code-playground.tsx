@@ -40,8 +40,8 @@ const defaultCode: ArticleCode = {
   jsx: `function Hero() {
   return (
     <div className="hero">
-      <h1 className="hero-title">その先の、体験へ。</h1>
-      <p className="hero-subtitle">Creative Dev Blog</p>
+      <h1 className="hero-title">流れに合わせて、印象を立ち上げる。</h1>
+      <p className="hero-subtitle">スクロールに合わせて見出しと背景の動きをずらし、導入にゆっくりリズムをつくります。</p>
     </div>
   )
 }`,
@@ -222,7 +222,7 @@ export function CodePlayground({ code }: CodePlaygroundProps) {
     textareaRef.current.style.height = '0px';
     textareaRef.current.style.height = `${Math.max(
       textareaRef.current.scrollHeight,
-      320,
+      320
     )}px`;
   }, []);
 

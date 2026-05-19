@@ -76,7 +76,7 @@ export function ArticleHeaderActions({
 
     if (target === 'x') {
       openShareWindow(
-        `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
+        `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`
       );
       setStatusMessage('Xの共有画面を開きました。');
       setIsShareMenuOpen(false);
@@ -85,7 +85,7 @@ export function ArticleHeaderActions({
 
     if (target === 'line') {
       openShareWindow(
-        `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`,
+        `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`
       );
       setStatusMessage('LINEの共有画面を開きました。');
       setIsShareMenuOpen(false);
@@ -94,7 +94,7 @@ export function ArticleHeaderActions({
 
     if (target === 'facebook') {
       openShareWindow(
-        `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+        `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
       );
       setStatusMessage('Facebookの共有画面を開きました。');
       setIsShareMenuOpen(false);
@@ -113,7 +113,7 @@ export function ArticleHeaderActions({
           variant="ghost"
           size="icon"
           className="h-9 w-9"
-          onClick={() => setIsShareMenuOpen((open) => !open)}
+          onClick={() => setIsShareMenuOpen(open => !open)}
           aria-expanded={isShareMenuOpen}
           aria-haspopup="menu"
         >

@@ -69,7 +69,7 @@ files:
               onMouseLeave={handleLeave}
             >
               <span ref={rippleRef} className="cta-ripple" />
-              <span className="cta-label">Launch Campaign</span>
+              <span className="cta-label">詳しく見る</span>
               <span ref={arrowRef} className="cta-arrow">↗</span>
             </button>
           </section>
@@ -182,7 +182,7 @@ code:
             onMouseLeave={handleLeave}
           >
             <span ref={rippleRef} className="cta-ripple" />
-            <span className="cta-label">Launch Campaign</span>
+            <span className="cta-label">詳しく見る</span>
             <span ref={arrowRef} className="cta-arrow">↗</span>
           </button>
         </section>

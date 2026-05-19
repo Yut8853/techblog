@@ -2,12 +2,7 @@ import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CodeThumbnail } from '@/components/code-thumbnail';
 import { Button } from '@/components/ui/button';
-import {
-  Github,
-  Dribbble,
-  Sparkles,
-  ChevronRight,
-} from 'lucide-react';
+import { Github, Dribbble, Sparkles, ChevronRight } from 'lucide-react';
 import { XIcon } from '@/components/x-icon';
 import { getPopularArticles, getArticleCountByCategory } from '@/lib/articles';
 import { categories } from '@/lib/config/categories';
@@ -123,8 +118,7 @@ export function CategorySidebar() {
             {author.bio}
           </p>
           <div className="mt-3 w-full rounded-lg border border-border/70 bg-muted/30 px-3 py-2 text-left text-xs text-muted-foreground">
-            運営元:
-            {' '}
+            運営元:{' '}
             <Link
               href={operator.url}
               target="_blank"

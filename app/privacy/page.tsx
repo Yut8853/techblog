@@ -40,11 +40,12 @@ export default function PrivacyPage() {
             プライバシーポリシー
           </h1>
           <p className="mt-6 text-base leading-8 text-muted-foreground md:text-lg">
-            Creative Dev Blogでは、利用者のプライバシーを尊重し、取得した情報を適切に取り扱います。本ページでは、当サイトにおける情報の取得方針と取り扱いについて説明します。
+            Creative Dev
+            Blogでは、利用者のプライバシーを尊重し、取得した情報を適切に取り扱います。本ページでは、当サイトにおける情報の取得方針と取り扱いについて説明します。
           </p>
 
           <div className="mt-10 space-y-6">
-            {sections.map((section) => (
+            {sections.map(section => (
               <section
                 key={section.title}
                 className="rounded-2xl border border-border/60 bg-background/80 p-6"

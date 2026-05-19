@@ -76,10 +76,10 @@ files:
             </div>
 
             <div className="orb-panel" ref={panelRef}>
-              <p className="orb-label">Transition x Loading</p>
-              <h1>待ち時間も、世界観の一部にする。</h1>
+              <p className="orb-label">Loading Transition</p>
+              <h1>待ち時間を、そのまま次の画面につなぐ。</h1>
               <p className="orb-copy">
-                ローディングの粒子がまとまり、次の画面の空気感へそのまま接続されるように設計しています。
+                粒子が集まる動きをローディングで終わらせず、そのまま次の表示へつなげています。
               </p>
             </div>
           </section>
@@ -232,10 +232,10 @@ code:
           </div>
 
           <div className="orb-panel" ref={panelRef}>
-            <p className="orb-label">Transition x Loading</p>
-            <h1>待ち時間も、世界観の一部にする。</h1>
+            <p className="orb-label">Loading Transition</p>
+            <h1>待ち時間を、そのまま次の画面につなぐ。</h1>
             <p className="orb-copy">
-              ローディングの粒子がまとまり、次の画面の空気感へそのまま接続されるように設計しています。
+              粒子が集まる動きをローディングで終わらせず、そのまま次の表示へつなげています。
             </p>
           </div>
         </section>

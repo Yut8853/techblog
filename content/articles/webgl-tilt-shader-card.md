@@ -55,9 +55,9 @@ files:
               onMouseLeave={handleLeave}
             >
               <div className="shader-noise" />
-              <p className="shader-label">3D Motion x Shader Feel</p>
-              <h1>Surface reacts like light is alive.</h1>
-              <p className="shader-copy">本物の WebGL ではなくても、発光位置とチルトを連動させると近い空気感を作れます。</p>
+                <p className="shader-label">Tilt + Glow</p>
+                <h1>光が面に追いつくように動かす。</h1>
+                <p className="shader-copy">発光の位置とチルトを一緒に動かし、奥行きがあるように見せています。</p>
             </div>
           </section>
         )
@@ -172,9 +172,9 @@ code:
             onMouseLeave={handleLeave}
           >
             <div className="shader-noise" />
-            <p className="shader-label">3D Motion x Shader Feel</p>
-            <h1>Surface reacts like light is alive.</h1>
-            <p className="shader-copy">本物の WebGL ではなくても、発光位置とチルトを連動させると近い空気感を作れます。</p>
+              <p className="shader-label">Tilt + Glow</p>
+              <h1>光が面に追いつくように動かす。</h1>
+              <p className="shader-copy">発光の位置とチルトを一緒に動かし、奥行きがあるように見せています。</p>
           </div>
         </section>
       )

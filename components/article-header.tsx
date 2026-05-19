@@ -1,21 +1,21 @@
-import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, Clock } from "lucide-react"
-import { ArticleHeaderActions } from "@/components/article-header-actions"
+import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Calendar, Clock } from 'lucide-react';
+import { ArticleHeaderActions } from '@/components/article-header-actions';
 
 interface ArticleHeaderProps {
-  title: string
-  description: string
+  title: string;
+  description: string;
   author: {
-    name: string
-    username: string
-    avatar: string
-  }
-  date: string
-  readTime: string
-  category: string
-  slug?: string
+    name: string;
+    username: string;
+    avatar: string;
+  };
+  date: string;
+  readTime: string;
+  category: string;
+  slug?: string;
 }
 
 export function ArticleHeader({
@@ -30,7 +30,10 @@ export function ArticleHeader({
   return (
     <div>
       {/* Category */}
-      <Badge variant="default" className="bg-accent text-accent-foreground hover:bg-accent/90">
+      <Badge
+        variant="default"
+        className="bg-accent text-accent-foreground hover:bg-accent/90"
+      >
         {category}
       </Badge>
 
@@ -64,7 +67,9 @@ export function ArticleHeader({
           </Avatar>
           <div>
             <div className="font-medium">{author.name}</div>
-            <div className="text-sm text-muted-foreground">@{author.username}</div>
+            <div className="text-sm text-muted-foreground">
+              @{author.username}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -79,5 +84,5 @@ export function ArticleHeader({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -49,11 +49,13 @@ function validateFilesArray(filePath, files) {
 
   files.forEach((file, index) => {
     if (!file || typeof file !== 'object') {
-      errors.push(`${filePath}: files[${index}] はオブジェクトである必要があります。`);
+      errors.push(
+        `${filePath}: files[${index}] はオブジェクトである必要があります。`
+      );
       return;
     }
 
-    ['name', 'language', 'content'].forEach((key) => {
+    ['name', 'language', 'content'].forEach(key => {
       if (!isNonEmptyString(file[key])) {
         errors.push(`${filePath}: files[${index}].${key} は必須です。`);
       }
@@ -83,10 +85,11 @@ function validateCodeBlock(filePath, code) {
 function validateFrontmatter(fileName, data, content) {
   const filePath = path.join('content', 'articles', fileName);
 
-  requiredStringFields.forEach((field) => {
-    const isValid = field === 'publishedAt'
-      ? isDateLikeValue(data[field])
-      : isNonEmptyString(data[field]);
+  requiredStringFields.forEach(field => {
+    const isValid =
+      field === 'publishedAt'
+        ? isDateLikeValue(data[field])
+        : isNonEmptyString(data[field]);
 
     if (!isValid) {
       errors.push(`${filePath}: ${field} は必須です。`);
@@ -95,14 +98,16 @@ function validateFrontmatter(fileName, data, content) {
 
   if (!Array.isArray(data.tags) || data.tags.length === 0) {
     errors.push(`${filePath}: tags は1件以上の配列である必要があります。`);
-  } else if (data.tags.some((tag) => !isNonEmptyString(tag))) {
+  } else if (data.tags.some(tag => !isNonEmptyString(tag))) {
     errors.push(`${filePath}: tags には空文字を含められません。`);
   }
 
   const publishedAt = normalizeDateValue(data.publishedAt);
 
   if (publishedAt && !/^\d{4}-\d{2}-\d{2}$/.test(publishedAt)) {
-    errors.push(`${filePath}: publishedAt は YYYY-MM-DD 形式で指定してください。`);
+    errors.push(
+      `${filePath}: publishedAt は YYYY-MM-DD 形式で指定してください。`
+    );
   }
 
   validateFilesArray(filePath, data.files);
@@ -120,7 +125,7 @@ if (!fs.existsSync(contentDir)) {
 
 const articleFiles = fs
   .readdirSync(contentDir)
-  .filter((file) => file.endsWith('.md') && !file.startsWith('_'));
+  .filter(file => file.endsWith('.md') && !file.startsWith('_'));
 
 if (articleFiles.length === 0) {
   console.error('検証対象の記事がありません。');

@@ -73,15 +73,15 @@ files:
               <div className="intro-layer intro-layer-back" ref={backRef} />
               <div className="intro-layer intro-layer-mid" ref={midRef} />
               <div className="intro-copy">
-                <p className="intro-label">Parallax x Text Reveal</p>
-                <h1 className="intro-title" ref={titleRef}>Depth makes the first impression.</h1>
+                <p className="intro-label">Parallax + Text</p>
+                <h1 className="intro-title" ref={titleRef}>奥行きのある導入で、最初の一瞬をつくる。</h1>
                 <p className="intro-description" ref={copyRef}>
-                  背景の視差とテキストの登場タイミングを分けることで、静かなのに印象が残る導入を作れます。
+                  背景の速度差と見出しの出るタイミングをずらして、静かなのに印象が残る導入にしています。
                 </p>
               </div>
             </section>
             <section className="intro-panel">
-              <p>スクロールしながら、背景レイヤーの速度差とタイトルの抜け方を確認してください。</p>
+              <p>スクロールすると、背景の動きと見出しの抜け方の差が少しずつ見えてきます。</p>
             </section>
           </div>
         )
@@ -230,15 +230,15 @@ code:
             <div className="intro-layer intro-layer-back" ref={backRef} />
             <div className="intro-layer intro-layer-mid" ref={midRef} />
             <div className="intro-copy">
-              <p className="intro-label">Parallax x Text Reveal</p>
-              <h1 className="intro-title" ref={titleRef}>Depth makes the first impression.</h1>
+              <p className="intro-label">Parallax + Text</p>
+              <h1 className="intro-title" ref={titleRef}>奥行きのある導入で、最初の一瞬をつくる。</h1>
               <p className="intro-description" ref={copyRef}>
-                背景の視差とテキストの登場タイミングを分けることで、静かなのに印象が残る導入を作れます。
+                背景の速度差と見出しの出るタイミングをずらして、静かなのに印象が残る導入にしています。
               </p>
             </div>
           </section>
           <section className="intro-panel">
-            <p>スクロールしながら、背景レイヤーの速度差とタイトルの抜け方を確認してください。</p>
+            <p>スクロールすると、背景の動きと見出しの抜け方の差が少しずつ見えてきます。</p>
           </section>
         </div>
       )

@@ -107,8 +107,7 @@ export function Sidebar() {
             {author.bio}
           </p>
           <div className="mt-3 w-full rounded-lg border border-border/70 bg-muted/30 px-3 py-2 text-left text-xs text-muted-foreground">
-            運営元:
-            {' '}
+            運営元:{' '}
             <Link
               href={operator.url}
               target="_blank"

@@ -36,23 +36,23 @@
 ## 重要ファイル
 
 - lib/articles.ts
-	- Markdown を読み込んで記事オブジェクト化する本体
-	- frontmatter 不足時はここで落ちる
+  - Markdown を読み込んで記事オブジェクト化する本体
+  - frontmatter 不足時はここで落ちる
 
-- content/articles/_template.md
-	- 新規記事追加時の雛形
-	- viewer, thumbnail, layout, files, code の見本あり
+- content/articles/\_template.md
+  - 新規記事追加時の雛形
+  - viewer, thumbnail, layout, files, code の見本あり
 
 - lib/config/categories.ts
-	- カテゴリ定義
-	- 表現タイプやカテゴリページの元データ
+  - カテゴリ定義
+  - 表現タイプやカテゴリページの元データ
 
 - lib/config/site.ts
-	- プロフィール、連絡先、SNS、運営元
+  - プロフィール、連絡先、SNS、運営元
 
 - components/code-playground.tsx
-	- Code Viewer 本体
-	- iframe でプレビュー実行
+  - Code Viewer 本体
+  - iframe でプレビュー実行
 
 ## ローカル起動
 
@@ -69,7 +69,7 @@ pnpm build
 
 ## 記事追加手順
 
-1. content/articles/_template.md をコピー
+1. content/articles/\_template.md をコピー
 2. ファイル名を slug.md に変更
 3. frontmatter を埋める
 4. 本文を書く

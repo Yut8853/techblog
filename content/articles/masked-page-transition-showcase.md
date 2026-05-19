@@ -24,8 +24,8 @@ files:
         const contentRef = React.useRef(null)
 
         const pages = [
-          { eyebrow: 'Chapter 01', title: 'A calm introduction', copy: '最初の画面は静かに置いて、遷移時だけ印象を強めます。', theme: 'theme-a' },
-          { eyebrow: 'Chapter 02', title: 'A tighter contrast', copy: 'マスクが広がるタイミングで、次の画面の情報を滑り込ませます。', theme: 'theme-b' },
+          { eyebrow: 'Scene 01', title: '静かな導入', copy: '最初の画面は情報を絞り、切り替わる瞬間だけ印象を強めています。', theme: 'theme-a' },
+          { eyebrow: 'Scene 02', title: '次の内容へ切り替え', copy: 'マスクが広がるタイミングで次の情報を滑り込ませ、流れを切らさないようにしています。', theme: 'theme-b' },
         ]
 
         const handleSwitch = () => {
@@ -66,7 +66,7 @@ files:
               <p className="transition-eyebrow">{current.eyebrow}</p>
               <h1>{current.title}</h1>
               <p className="transition-copy">{current.copy}</p>
-              <button onClick={handleSwitch} className="transition-button">Switch View</button>
+              <button onClick={handleSwitch} className="transition-button">切り替える</button>
             </div>
           </section>
         )
@@ -155,8 +155,8 @@ code:
       const contentRef = React.useRef(null)
 
       const pages = [
-        { eyebrow: 'Chapter 01', title: 'A calm introduction', copy: '最初の画面は静かに置いて、遷移時だけ印象を強めます。', theme: 'theme-a' },
-        { eyebrow: 'Chapter 02', title: 'A tighter contrast', copy: 'マスクが広がるタイミングで、次の画面の情報を滑り込ませます。', theme: 'theme-b' },
+        { eyebrow: 'Scene 01', title: '静かな導入', copy: '最初の画面は情報を絞り、切り替わる瞬間だけ印象を強めています。', theme: 'theme-a' },
+        { eyebrow: 'Scene 02', title: '次の内容へ切り替え', copy: 'マスクが広がるタイミングで次の情報を滑り込ませ、流れを切らさないようにしています。', theme: 'theme-b' },
       ]
 
       const handleSwitch = () => {
@@ -197,7 +197,7 @@ code:
             <p className="transition-eyebrow">{current.eyebrow}</p>
             <h1>{current.title}</h1>
             <p className="transition-copy">{current.copy}</p>
-            <button onClick={handleSwitch} className="transition-button">Switch View</button>
+            <button onClick={handleSwitch} className="transition-button">切り替える</button>
           </div>
         </section>
       )

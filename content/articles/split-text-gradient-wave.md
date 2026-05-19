@@ -22,7 +22,7 @@ files:
       function SplitWave() {
         const lettersRef = React.useRef([])
         const lineRef = React.useRef(null)
-        const text = 'MOTION SPELLS OUT THE MOOD'
+        const text = 'JUNKBRANDING'
 
         React.useEffect(() => {
           const ctx = gsap.context(() => {
@@ -61,7 +61,7 @@ files:
 
         return (
           <section className="split-wave-stage">
-            <p className="split-wave-label">Split Text x Gradient</p>
+            <p className="split-wave-label">Split Text + Gradient</p>
             <h1 className="split-wave-title" aria-label={text}>
               {text.split('').map((char, index) => (
                 <span
@@ -76,7 +76,7 @@ files:
               ))}
             </h1>
             <div ref={lineRef} className="split-wave-line" />
-            <p className="split-wave-copy">文字ごとの立ち上がりを少しずつずらし、最後にゆるいウェーブを足しています。</p>
+            <p className="split-wave-copy">文字が順番に立ち上がったあと、少しだけ揺れを残して表情をつけています。</p>
           </section>
         )
       }
@@ -137,7 +137,7 @@ code:
     function SplitWave() {
       const lettersRef = React.useRef([])
       const lineRef = React.useRef(null)
-      const text = 'MOTION SPELLS OUT THE MOOD'
+      const text = 'JUNKBRANDING'
 
       React.useEffect(() => {
         const ctx = gsap.context(() => {
@@ -176,7 +176,7 @@ code:
 
       return (
         <section className="split-wave-stage">
-          <p className="split-wave-label">Split Text x Gradient</p>
+          <p className="split-wave-label">Split Text + Gradient</p>
           <h1 className="split-wave-title" aria-label={text}>
             {text.split('').map((char, index) => (
               <span
@@ -191,7 +191,7 @@ code:
             ))}
           </h1>
           <div ref={lineRef} className="split-wave-line" />
-          <p className="split-wave-copy">文字ごとの立ち上がりを少しずつずらし、最後にゆるいウェーブを足しています。</p>
+          <p className="split-wave-copy">文字が順番に立ち上がったあと、少しだけ揺れを残して表情をつけています。</p>
         </section>
       )
     }

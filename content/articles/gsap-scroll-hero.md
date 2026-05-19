@@ -66,20 +66,20 @@ files:
               <div className="hero-glow" ref={glowRef} />
               <div className="hero-grid" />
               <div className="hero-copy">
-                <p className="hero-eyebrow">GSAP ScrollTrigger</p>
-                <h1 className="hero-title" ref={titleRef}>その先の、体験へ。</h1>
+                <p className="hero-eyebrow">Scroll Hero</p>
+                <h1 className="hero-title" ref={titleRef}>流れに合わせて、印象を立ち上げる。</h1>
                 <p className="hero-subtitle" ref={leadRef}>
-                  スクロールに合わせて、コピーと背景のレイヤーがゆっくりほどけていく。
+                  スクロールに合わせて見出しと背景の動きをずらし、導入にゆっくりリズムをつくります。
                 </p>
               </div>
             </section>
 
             <section className="hero-panel hero-panel-dark">
-              <p>スクロールすると、ヒーローをピン留めしたままタイトルが上へ抜けていきます。</p>
+              <p>ヒーローを固定したままタイトルだけを先に抜き、次のセクションへ視線をつなげています。</p>
             </section>
 
             <section className="hero-panel hero-panel-light">
-              <p>見出し、リード、背景のグローを別々に動かして、奥行きのある導入にしています。</p>
+              <p>見出し、リード、背景の光を少しずつ別の速度で動かし、奥行きが出るようにしています。</p>
             </section>
           </div>
         )
@@ -236,20 +236,20 @@ code:
             <div className="hero-glow" ref={glowRef} />
             <div className="hero-grid" />
             <div className="hero-copy">
-              <p className="hero-eyebrow">GSAP ScrollTrigger</p>
-              <h1 className="hero-title" ref={titleRef}>その先の、体験へ。</h1>
+              <p className="hero-eyebrow">Scroll Hero</p>
+              <h1 className="hero-title" ref={titleRef}>流れに合わせて、印象を立ち上げる。</h1>
               <p className="hero-subtitle" ref={leadRef}>
-                スクロールに合わせて、コピーと背景のレイヤーがゆっくりほどけていく。
+                スクロールに合わせて見出しと背景の動きをずらし、導入にゆっくりリズムをつくります。
               </p>
             </div>
           </section>
 
           <section className="hero-panel hero-panel-dark">
-            <p>スクロールすると、ヒーローをピン留めしたままタイトルが上へ抜けていきます。</p>
+            <p>ヒーローを固定したままタイトルだけを先に抜き、次のセクションへ視線をつなげています。</p>
           </section>
 
           <section className="hero-panel hero-panel-light">
-            <p>見出し、リード、背景のグローを別々に動かして、奥行きのある導入にしています。</p>
+            <p>見出し、リード、背景の光を少しずつ別の速度で動かし、奥行きが出るようにしています。</p>
           </section>
         </div>
       )

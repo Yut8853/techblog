@@ -41,9 +41,9 @@ files:
               ))}
             </div>
             <div className="glass-panel">
-              <p className="glass-label">Particles x Glass</p>
-              <h1>背景は、情報を邪魔せず盛り上げる。</h1>
-              <p>粒子は細かく動かし、情報面はガラスパネルで静かに固定しています。</p>
+                <p className="glass-label">Particles + Glass</p>
+                <h1>背景は動かして、情報は静かに置く。</h1>
+                <p>粒子は細かく動かし、情報面はガラスパネルで落ち着いて読めるようにしています。</p>
             </div>
           </section>
         )
@@ -155,9 +155,9 @@ code:
             ))}
           </div>
           <div className="glass-panel">
-            <p className="glass-label">Particles x Glass</p>
-            <h1>背景は、情報を邪魔せず盛り上げる。</h1>
-            <p>粒子は細かく動かし、情報面はガラスパネルで静かに固定しています。</p>
+              <p className="glass-label">Particles + Glass</p>
+              <h1>背景は動かして、情報は静かに置く。</h1>
+              <p>粒子は細かく動かし、情報面はガラスパネルで落ち着いて読めるようにしています。</p>
           </div>
         </section>
       )

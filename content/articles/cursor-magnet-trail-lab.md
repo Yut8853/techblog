@@ -62,16 +62,16 @@ files:
           <section className="cursor-lab">
             <div ref={cursorRef} className="cursor-orb" />
             <div className="cursor-copy">
-              <p className="cursor-label">Custom Cursor x Magnet</p>
-              <h1>ポインタ自体を演出にする。</h1>
-              <p>カーソルの余韻と CTA の引力を合わせると、単純なボタンでも触感が変わります。</p>
+              <p className="cursor-label">Cursor + Magnet</p>
+              <h1>カーソルの動きまで、気持ちよくする。</h1>
+              <p>近づいたときに少し吸い付く動きを入れるだけで、ボタンの触り心地が変わります。</p>
               <button
                 ref={buttonRef}
                 className="cursor-button"
                 onMouseMove={handleMove}
                 onMouseLeave={handleLeave}
               >
-                Hover the CTA
+                詳しく見る
               </button>
             </div>
           </section>
@@ -192,16 +192,16 @@ code:
         <section className="cursor-lab">
           <div ref={cursorRef} className="cursor-orb" />
           <div className="cursor-copy">
-            <p className="cursor-label">Custom Cursor x Magnet</p>
-            <h1>ポインタ自体を演出にする。</h1>
-            <p>カーソルの余韻と CTA の引力を合わせると、単純なボタンでも触感が変わります。</p>
+            <p className="cursor-label">Cursor + Magnet</p>
+            <h1>カーソルの動きまで、気持ちよくする。</h1>
+            <p>近づいたときに少し吸い付く動きを入れるだけで、ボタンの触り心地が変わります。</p>
             <button
               ref={buttonRef}
               className="cursor-button"
               onMouseMove={handleMove}
               onMouseLeave={handleLeave}
             >
-              Hover the CTA
+              詳しく見る
             </button>
           </div>
         </section>

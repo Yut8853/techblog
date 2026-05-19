@@ -29,7 +29,7 @@ export default function PurposePage() {
           </p>
 
           <div className="mt-10 space-y-4">
-            {purposes.map((purpose) => (
+            {purposes.map(purpose => (
               <section
                 key={purpose}
                 className="rounded-2xl border border-border/60 bg-background/80 p-6"
