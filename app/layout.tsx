@@ -8,7 +8,7 @@ const _geistMono = Geist_Mono({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Creative Dev Blog',
-  description: 'CodePenブログのNext.js版テンプレート',
+  description: 'JUNKBRANDINGのクリエイティブテックブログ',
   icons: {
     icon: [
       {
