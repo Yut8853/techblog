@@ -3,11 +3,11 @@ title: 3Dモーションとシェーダー風発光を組み合わせたビジ�
 description: 3D チルトの動きにシェーダー風の発光レイヤーを重ねて、WebGL ライクなカード表現を作る実験です。
 category: 3D・WebGL寄り
 tags:
-  - 3Dモーション
-  - WebGL表現
-  - シェーダー表現
+  - GSAP
   - 3D
   - WebGL
+  - アニメーション
+  - インタラクション
 date: 2026年5月19日
 publishedAt: 2026-05-19
 readTime: 6分

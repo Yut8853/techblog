@@ -3,11 +3,10 @@ title: リップルと矢印リフトを組み合わせたCTAボタン演出
 description: ホバー時のリップル拡張と矢印の持ち上がりを組み合わせて、押したくなる CTA を作る実験です。
 category: ボタン・CTA系
 tags:
-  - ボタンアニメーション
-  - ホバーCTA
-  - マグネットボタン
-  - UI
+  - GSAP
+  - アニメーション
   - インタラクション
+  - UI
 date: 2026年5月19日
 publishedAt: 2026-05-19
 readTime: 4分

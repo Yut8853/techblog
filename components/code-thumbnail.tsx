@@ -1,11 +1,18 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import type { ArticleCode } from '@/lib/articles/types';
+import type { ArticleCode, ArticleFile } from '@/lib/articles/types';
+
+type PreviewMode = 'thumbnail' | 'player';
 
 interface CodeThumbnailProps {
   code?: ArticleCode;
+  files?: ArticleFile[];
   fallbackClass?: string;
+  mode?: PreviewMode;
+  className?: string;
+  title?: string;
+  reloadToken?: number;
 }
 
 // JSXコードから最初の関数コンポーネント名を抽出
@@ -14,11 +21,123 @@ function extractComponentName(jsxCode: string): string {
   return match ? match[1] : 'App';
 }
 
-function generatePreviewHTML(jsxCode: string, cssCode: string): string {
+function getFileExtension(fileName: string): string {
+  return fileName.split('.').pop()?.toLowerCase() || '';
+}
+
+function buildCodeFiles(
+  code?: ArticleCode,
+  files?: ArticleFile[]
+): Record<string, string> {
+  if (files && files.length > 0) {
+    return Object.fromEntries(files.map(file => [file.name, file.content]));
+  }
+
+  if (code) {
+    return {
+      'Component.jsx': code.jsx,
+      'styles.css': code.css,
+    };
+  }
+
+  return {};
+}
+
+function getPreviewShellStyles(mode: PreviewMode): string {
+  if (mode === 'player') {
+    return `
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { min-height: 100%; }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        overflow-x: hidden;
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+        background: #020617;
+      }
+    `;
+  }
+
+  return `
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      overflow: hidden;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+  `;
+}
+
+function getPlaybackScript(mode: PreviewMode): string {
+  if (mode !== 'player') {
+    return '';
+  }
+
+  return `
+    <script>
+      (function () {
+        const wait = ms => new Promise(resolve => window.setTimeout(resolve, ms));
+
+        async function replayScrollPreview() {
+          const scroller = document.scrollingElement || document.documentElement;
+          scroller.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+          if (window.ScrollTrigger) {
+            try {
+              window.ScrollTrigger.refresh();
+            } catch (error) {
+              console.warn(error);
+            }
+          }
+
+          await wait(320);
+
+          const maxScroll = Math.max(0, scroller.scrollHeight - window.innerHeight);
+          if (maxScroll < 64) {
+            return;
+          }
+
+          const firstStop = Math.min(
+            maxScroll,
+            Math.max(window.innerHeight * 0.7, maxScroll * 0.45)
+          );
+
+          scroller.scrollTo({ top: firstStop, behavior: 'smooth' });
+          await wait(1600);
+
+          if (maxScroll > firstStop + 48) {
+            scroller.scrollTo({ top: maxScroll, behavior: 'smooth' });
+            await wait(1800);
+          }
+
+          scroller.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('load', () => {
+          window.setTimeout(() => {
+            void replayScrollPreview();
+          }, 220);
+        });
+      })();
+    </script>
+  `;
+}
+
+function generateReactPreviewHTML(
+  jsxCode: string,
+  cssCode: string,
+  baseOrigin: string,
+  mode: PreviewMode
+): string {
   const componentName = extractComponentName(jsxCode);
 
-  // アニメーションを自動ループさせるためのラッパー
-  const loopWrapper = `
+  const loopWrapper = mode === 'thumbnail'
+    ? `
     function ThumbnailWrapper() {
       const [key, setKey] = React.useState(0);
       
@@ -31,7 +150,12 @@ function generatePreviewHTML(jsxCode: string, cssCode: string): string {
       
       return <${componentName} key={key} />;
     }
-  `;
+  `
+    : '';
+
+  const rootComponent = mode === 'thumbnail'
+    ? 'ThumbnailWrapper'
+    : componentName;
 
   return `
 <!DOCTYPE html>
@@ -39,14 +163,16 @@ function generatePreviewHTML(jsxCode: string, cssCode: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="${baseOrigin}/">
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
   <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
+  <script src="https://unpkg.com/gsap@3/dist/SplitText.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
+    ${getPreviewShellStyles(mode)}
     ${cssCode}
   </style>
 </head>
@@ -58,45 +184,128 @@ function generatePreviewHTML(jsxCode: string, cssCode: string): string {
     ${loopWrapper}
     
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<ThumbnailWrapper />);
+    root.render(<${rootComponent} />);
   </script>
+  ${getPlaybackScript(mode)}
 </body>
 </html>
 `;
 }
 
-export function CodeThumbnail({ code, fallbackClass }: CodeThumbnailProps) {
+function generateHtmlPreviewHTML(
+  htmlCode: string,
+  cssCode: string,
+  jsCode: string,
+  baseOrigin: string,
+  mode: PreviewMode
+): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="${baseOrigin}/">
+  <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
+  <script src="https://unpkg.com/gsap@3/dist/SplitText.min.js"></script>
+  <style>
+    ${getPreviewShellStyles(mode)}
+    ${cssCode}
+  </style>
+</head>
+<body>
+  ${htmlCode}
+  <script>
+    ${jsCode}
+  </script>
+  ${getPlaybackScript(mode)}
+</body>
+</html>
+`;
+}
+
+function generatePreviewHTML(
+  codeFiles: Record<string, string>,
+  baseOrigin: string,
+  mode: PreviewMode
+): string | null {
+  const entries = Object.entries(codeFiles);
+  const htmlEntry = entries.find(([fileName]) =>
+    ['html', 'htm'].includes(getFileExtension(fileName))
+  );
+  const cssCode = entries
+    .filter(([fileName]) => getFileExtension(fileName) === 'css')
+    .map(([, content]) => content)
+    .join('\n\n');
+
+  if (htmlEntry) {
+    const jsCode = entries
+      .filter(([fileName]) => ['js', 'mjs'].includes(getFileExtension(fileName)))
+      .map(([, content]) => content)
+      .join('\n\n');
+
+    return generateHtmlPreviewHTML(
+      htmlEntry[1],
+      cssCode,
+      jsCode,
+      baseOrigin,
+      mode
+    );
+  }
+
+  const jsxEntry = entries.find(([fileName]) =>
+    ['jsx', 'tsx'].includes(getFileExtension(fileName))
+  );
+
+  if (!jsxEntry) {
+    return null;
+  }
+
+  return generateReactPreviewHTML(jsxEntry[1], cssCode, baseOrigin, mode);
+}
+
+export function CodeThumbnail({
+  code,
+  files,
+  fallbackClass,
+  mode = 'thumbnail',
+  className,
+  title = 'Code Preview Thumbnail',
+  reloadToken = 0,
+}: CodeThumbnailProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const codeFiles = buildCodeFiles(code, files);
+  const hasPreview = Object.keys(codeFiles).length > 0;
 
   useEffect(() => {
-    if (!iframeRef.current || !code) return;
+    if (!iframeRef.current || !hasPreview) return;
 
-    const html = generatePreviewHTML(code.jsx, code.css);
+    const html = generatePreviewHTML(codeFiles, window.location.origin, mode);
+    if (!html) return;
+
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     iframeRef.current.src = url;
 
     return () => URL.revokeObjectURL(url);
-  }, [code]);
+  }, [codeFiles, hasPreview, mode, reloadToken]);
 
-  if (!code) {
+  if (!hasPreview) {
     return (
       <div
-        className={`w-full h-full ${fallbackClass || 'bg-linear-to-br from-slate-800 via-slate-900 to-slate-950'}`}
-      >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="h-3/4 w-3/4 rounded-lg border border-white/10 bg-linear-to-br from-white/10 via-white/5 to-transparent backdrop-blur-sm" />
-        </div>
-      </div>
+        className={`${className || 'w-full h-full'} ${fallbackClass || 'bg-linear-to-br from-slate-800 via-slate-900 to-slate-950'}`}
+      />
     );
   }
 
   return (
     <iframe
       ref={iframeRef}
-      className="w-full h-full border-0 pointer-events-none"
-      title="Code Preview Thumbnail"
-      sandbox="allow-scripts"
+      className={`${className || 'w-full h-full'} border-0 ${mode === 'thumbnail' ? 'pointer-events-none' : ''}`}
+      title={title}
+      sandbox="allow-scripts allow-same-origin"
     />
   );
 }

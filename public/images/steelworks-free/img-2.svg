@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract editorial gradient panel 2</title>
+  <desc id="desc">Self-authored monochrome composition with grain-like layers and portrait framing.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#e6e1da"/>
+      <stop offset="100%" stop-color="#c9c1b7"/>
+    </linearGradient>
+    <radialGradient id="face" cx="58%" cy="45%" r="34%">
+      <stop offset="0%" stop-color="#8e857b"/>
+      <stop offset="100%" stop-color="#3e3834"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect x="320" y="0" width="320" height="900" fill="#1e1b1a" opacity="0.95"/>
+  <circle cx="975" cy="420" r="255" fill="url(#face)"/>
+  <path d="M846 346c58-95 186-132 286-56 56 43 85 98 100 163-79-15-142-3-224 42-80 43-133 41-214 18 3-63 16-117 52-167z" fill="#5c564f"/>
+  <path d="M733 660c88-61 190-68 306-18-71 68-151 96-266 91-43-16-62-38-40-73z" fill="#b5a89a" opacity="0.88"/>
+  <g opacity="0.18" stroke="#ffffff">
+    <path d="M0 120h1600"/>
+    <path d="M0 420h1600"/>
+    <path d="M0 720h1600"/>
+  </g>
+</svg>

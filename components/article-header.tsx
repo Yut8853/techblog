@@ -16,6 +16,7 @@ interface ArticleHeaderProps {
   readTime: string;
   category: string;
   slug?: string;
+  linkedTitle?: boolean;
 }
 
 export function ArticleHeader({
@@ -26,6 +27,7 @@ export function ArticleHeader({
   readTime,
   category,
   slug,
+  linkedTitle = false,
 }: ArticleHeaderProps) {
   return (
     <div>
@@ -38,18 +40,20 @@ export function ArticleHeader({
       </Badge>
 
       {/* Title */}
-      <div className="mt-4 flex items-start justify-between gap-4">
-        {slug ? (
-          <Link href={`/articles/${slug}`}>
-            <h1 className="text-2xl font-bold leading-tight md:text-3xl lg:text-4xl text-balance text-blue-600 hover:text-blue-800 transition-colors">
+      <div className="mt-4 flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
+        <div className="min-w-0 flex-1">
+          {linkedTitle && slug ? (
+            <Link href={`/articles/${slug}`} className="block">
+              <h1 className="text-2xl font-bold leading-tight text-balance text-blue-600 transition-colors hover:text-blue-800 md:text-3xl lg:text-4xl">
+                {title}
+              </h1>
+            </Link>
+          ) : (
+            <h1 className="text-2xl font-bold leading-tight text-balance md:text-3xl lg:text-4xl">
               {title}
             </h1>
-          </Link>
-        ) : (
-          <h1 className="text-2xl font-bold leading-tight md:text-3xl lg:text-4xl text-balance">
-            {title}
-          </h1>
-        )}
+          )}
+        </div>
         <ArticleHeaderActions title={title} slug={slug} />
       </div>
 
@@ -59,7 +63,7 @@ export function ArticleHeader({
       </p>
 
       {/* Author Info */}
-      <div className="mt-6 flex items-center gap-4">
+      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src={author.avatar} alt={author.name} />
@@ -72,7 +76,7 @@ export function ArticleHeader({
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Calendar className="h-4 w-4" />
             <span>{date}</span>

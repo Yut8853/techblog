@@ -9,8 +9,14 @@ import { getPopularArticles, getArticleCountByCategory } from '@/lib/articles';
 import { categories } from '@/lib/config/categories';
 import { siteConfig } from '@/lib/config/site';
 
-export function Sidebar() {
-  const popularArticles = getPopularArticles(5);
+interface SidebarProps {
+  excludeSlugs?: string[];
+}
+
+export function Sidebar({ excludeSlugs = [] }: SidebarProps) {
+  const popularArticles = getPopularArticles(10)
+    .filter(article => !excludeSlugs.includes(article.slug))
+    .slice(0, 5);
   const { author, operator } = siteConfig;
 
   // 記事数でカテゴリーを拡張
@@ -74,6 +80,7 @@ export function Sidebar() {
                     <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
                       <CodeThumbnail
                         code={article.code}
+                        files={article.files}
                         fallbackClass={article.thumbnail}
                       />
                     </div>

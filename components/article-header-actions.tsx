@@ -107,12 +107,12 @@ export function ArticleHeaderActions({
   };
 
   return (
-    <div className="relative" ref={containerRef}>
+    <div className="relative shrink-0 self-end sm:self-start" ref={containerRef}>
       <div className="flex shrink-0 items-center gap-2">
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9"
+          className="h-9 w-9 min-h-9 min-w-9 flex-none rounded-full"
           onClick={() => setIsShareMenuOpen(open => !open)}
           aria-expanded={isShareMenuOpen}
           aria-haspopup="menu"
@@ -123,50 +123,50 @@ export function ArticleHeaderActions({
       </div>
 
       {isShareMenuOpen && (
-        <div className="absolute right-0 top-12 z-20 w-64 rounded-2xl border border-border bg-card p-3 shadow-xl">
+        <div className="absolute right-0 top-12 z-20 w-[min(16rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] rounded-2xl border border-border bg-card p-3 shadow-xl">
           <p className="px-2 pb-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Share
           </p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2">
             <button
               type="button"
               onClick={() => void handleShare('x')}
-              className="flex items-center gap-2 rounded-xl border border-border px-3 py-3 text-left text-sm transition-colors hover:border-blue-300 hover:bg-blue-50/70"
+              className="flex w-full items-center gap-2 rounded-xl border border-border px-3 py-3 text-left text-sm transition-colors hover:border-blue-300 hover:bg-blue-50/70"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background">
-                <XIcon className="h-3.5 w-3.5" />
+              <span className="flex size-8 shrink-0 flex-none items-center justify-center rounded-full bg-foreground text-background">
+                <XIcon className="h-3.5 w-3.5 shrink-0" />
               </span>
-              <span>X</span>
+              <span className="min-w-0">X</span>
             </button>
             <button
               type="button"
               onClick={() => void handleShare('line')}
-              className="flex items-center gap-2 rounded-xl border border-border px-3 py-3 text-left text-sm transition-colors hover:border-emerald-300 hover:bg-emerald-50/70"
+              className="flex w-full items-center gap-2 rounded-xl border border-border px-3 py-3 text-left text-sm transition-colors hover:border-emerald-300 hover:bg-emerald-50/70"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white">
-                <MessageCircle className="h-4 w-4" />
+              <span className="flex size-8 shrink-0 flex-none items-center justify-center rounded-full bg-emerald-500 text-white">
+                <MessageCircle className="h-4 w-4 shrink-0" />
               </span>
-              <span>LINE</span>
+              <span className="min-w-0">LINE</span>
             </button>
             <button
               type="button"
               onClick={() => void handleShare('facebook')}
-              className="flex items-center gap-2 rounded-xl border border-border px-3 py-3 text-left text-sm transition-colors hover:border-sky-300 hover:bg-sky-50/70"
+              className="flex w-full items-center gap-2 rounded-xl border border-border px-3 py-3 text-left text-sm transition-colors hover:border-sky-300 hover:bg-sky-50/70"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-600 text-white">
-                <Facebook className="h-4 w-4" />
+              <span className="flex size-8 shrink-0 flex-none items-center justify-center rounded-full bg-sky-600 text-white">
+                <Facebook className="h-4 w-4 shrink-0" />
               </span>
-              <span>Facebook</span>
+              <span className="min-w-0 wrap-break-word">Facebook</span>
             </button>
             <button
               type="button"
               onClick={() => void handleShare('instagram')}
-              className="flex items-center gap-2 rounded-xl border border-border px-3 py-3 text-left text-sm transition-colors hover:border-pink-300 hover:bg-pink-50/70"
+              className="flex w-full items-center gap-2 rounded-xl border border-border px-3 py-3 text-left text-sm transition-colors hover:border-pink-300 hover:bg-pink-50/70"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-fuchsia-500 via-pink-500 to-orange-400 text-white">
-                <Link2 className="h-4 w-4" />
+              <span className="flex size-8 shrink-0 flex-none items-center justify-center rounded-full bg-linear-to-br from-fuchsia-500 via-pink-500 to-orange-400 text-white">
+                <Link2 className="h-4 w-4 shrink-0" />
               </span>
-              <span>Instagram</span>
+              <span className="min-w-0 wrap-break-word">Instagram</span>
             </button>
           </div>
           <p className="px-2 pt-3 text-xs leading-5 text-muted-foreground">
@@ -176,7 +176,7 @@ export function ArticleHeaderActions({
       )}
 
       {statusMessage && (
-        <div className="absolute right-0 top-18 z-10 flex items-center gap-2 rounded-full bg-foreground px-3 py-1.5 text-xs text-background shadow-lg">
+        <div className="absolute right-0 top-18 z-10 max-w-[calc(100vw-2rem)] flex items-center gap-2 rounded-full bg-foreground px-3 py-1.5 text-xs text-background shadow-lg">
           <Check className="h-3.5 w-3.5" />
           <span>{statusMessage}</span>
         </div>

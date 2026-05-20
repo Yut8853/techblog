@@ -7,6 +7,8 @@ import { RelatedArticles } from '@/components/related-articles';
 import { ArticleHeader } from '@/components/article-header';
 import { getLatestArticles } from '@/lib/articles';
 
+const hiddenHomeSlugs = ['particle-glass-background-shift'];
+
 export default function Home() {
   const article = getLatestArticles(1)[0];
 
@@ -20,9 +22,7 @@ export default function Home() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-          {/* Main Content */}
           <div>
-            {/* Article Header */}
             <ArticleHeader
               title={article.title}
               description={article.description}
@@ -35,22 +35,22 @@ export default function Home() {
               readTime={article.readTime}
               category={article.category}
               slug={article.slug}
+              linkedTitle
             />
 
-            {/* Code Playground (Preview + Editor) */}
             <div className="mt-8">
-              <CodePlayground code={article?.code} />
+              <CodePlayground code={article.code} files={article.files} />
             </div>
 
-            {/* Expression Types */}
             <ExpressionTypes />
 
-            {/* Related Articles */}
-            <RelatedArticles currentSlug={article.slug} />
+            <RelatedArticles
+              currentSlug={article.slug}
+              excludeSlugs={hiddenHomeSlugs}
+            />
           </div>
 
-          {/* Sidebar */}
-          <Sidebar />
+          <Sidebar excludeSlugs={hiddenHomeSlugs} />
         </div>
       </main>
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronRight, ChevronDown, File, Folder } from 'lucide-react';
-import type { ArticleCode } from '@/lib/articles/types';
+import type { ArticleCode, ArticleFile } from '@/lib/articles/types';
 
 interface FileNode {
   name: string;
@@ -13,28 +13,8 @@ interface FileNode {
 
 interface CodePlaygroundProps {
   code?: ArticleCode;
+  files?: ArticleFile[];
 }
-
-const defaultFileStructure: FileNode[] = [
-  {
-    name: 'src',
-    type: 'folder',
-    children: [
-      {
-        name: 'components',
-        type: 'folder',
-        children: [
-          { name: 'Component.jsx', type: 'file', path: 'Component.jsx' },
-        ],
-      },
-      {
-        name: 'styles',
-        type: 'folder',
-        children: [{ name: 'styles.css', type: 'file', path: 'styles.css' }],
-      },
-    ],
-  },
-];
 
 const defaultCode: ArticleCode = {
   jsx: `function Hero() {
@@ -70,10 +50,50 @@ const defaultCode: ArticleCode = {
 }`,
 };
 
-// JSXコードから最初の関数コンポーネント名を抽出
+const defaultFiles: ArticleFile[] = [
+  { name: 'Component.jsx', language: 'jsx', content: defaultCode.jsx },
+  { name: 'styles.css', language: 'css', content: defaultCode.css },
+];
+
 function extractComponentName(jsxCode: string): string {
   const match = jsxCode.match(/function\s+(\w+)\s*\(/);
   return match ? match[1] : 'App';
+}
+
+function getFileExtension(fileName: string): string {
+  return fileName.split('.').pop()?.toLowerCase() || '';
+}
+
+function buildCodeFiles(
+  code?: ArticleCode,
+  files?: ArticleFile[]
+): Record<string, string> {
+  if (files && files.length > 0) {
+    return Object.fromEntries(files.map(file => [file.name, file.content]));
+  }
+
+  if (code) {
+    return {
+      'Component.jsx': code.jsx,
+      'styles.css': code.css,
+    };
+  }
+
+  return Object.fromEntries(defaultFiles.map(file => [file.name, file.content]));
+}
+
+function buildFileStructure(fileNames: string[]): FileNode[] {
+  return [
+    {
+      name: 'project',
+      type: 'folder',
+      children: fileNames.map(fileName => ({
+        name: fileName,
+        type: 'file',
+        path: fileName,
+      })),
+    },
+  ];
 }
 
 function FileTreeItem({
@@ -95,7 +115,7 @@ function FileTreeItem({
       <div>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex w-full items-center gap-1 py-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="flex w-full items-center gap-1 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
           style={{ paddingLeft }}
         >
           {isOpen ? (
@@ -124,15 +144,24 @@ function FileTreeItem({
   }
 
   const getFileIcon = (name: string) => {
-    if (name.endsWith('.jsx') || name.endsWith('.tsx')) {
+    const extension = getFileExtension(name);
+
+    if (extension === 'html') {
+      return <File className="h-4 w-4 text-orange-400" />;
+    }
+
+    if (extension === 'js' || extension === 'mjs') {
+      return <File className="h-4 w-4 text-yellow-400" />;
+    }
+
+    if (extension === 'jsx' || extension === 'tsx') {
       return <File className="h-4 w-4 text-blue-500" />;
     }
-    if (name.endsWith('.ts')) {
-      return <File className="h-4 w-4 text-blue-600" />;
-    }
-    if (name.endsWith('.scss') || name.endsWith('.css')) {
+
+    if (extension === 'css' || extension === 'scss') {
       return <File className="h-4 w-4 text-pink-500" />;
     }
+
     return <File className="h-4 w-4" />;
   };
 
@@ -141,9 +170,9 @@ function FileTreeItem({
   return (
     <button
       onClick={() => node.path && onSelectFile(node.path)}
-      className={`flex w-full items-center gap-1 py-1 text-sm transition-colors cursor-pointer ${
+      className={`flex w-full cursor-pointer items-center gap-1 py-1 text-sm transition-colors ${
         isSelected
-          ? 'text-accent font-medium bg-accent/10'
+          ? 'bg-muted font-medium text-foreground'
           : 'text-muted-foreground hover:text-foreground'
       }`}
       style={{ paddingLeft: paddingLeft + 20 }}
@@ -154,7 +183,11 @@ function FileTreeItem({
   );
 }
 
-function generatePreviewHTML(jsxCode: string, cssCode: string): string {
+function generateReactPreviewHTML(
+  jsxCode: string,
+  cssCode: string,
+  baseOrigin: string
+): string {
   const componentName = extractComponentName(jsxCode);
 
   return `
@@ -163,10 +196,13 @@ function generatePreviewHTML(jsxCode: string, cssCode: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="${baseOrigin}/">
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
   <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
+  <script src="https://unpkg.com/gsap@3/dist/SplitText.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -179,7 +215,6 @@ function generatePreviewHTML(jsxCode: string, cssCode: string): string {
   <div id="root"></div>
   <script type="text/babel">
     ${jsxCode}
-    
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<${componentName} />);
   </script>
@@ -188,27 +223,95 @@ function generatePreviewHTML(jsxCode: string, cssCode: string): string {
 `;
 }
 
-export function CodePlayground({ code }: CodePlaygroundProps) {
-  const initialCode = code || defaultCode;
-  const [codeFiles, setCodeFiles] = useState({
-    'Component.jsx': initialCode.jsx,
-    'styles.css': initialCode.css,
-  });
-  const [selectedFile, setSelectedFile] = useState('Component.jsx');
+function generateHtmlPreviewHTML(
+  htmlCode: string,
+  cssCode: string,
+  jsCode: string,
+  baseOrigin: string
+): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="${baseOrigin}/">
+  <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
+  <script src="https://unpkg.com/gsap@3/dist/SplitText.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    ${cssCode}
+  </style>
+</head>
+<body>
+  ${htmlCode}
+  <script>
+    ${jsCode}
+  </script>
+</body>
+</html>
+`;
+}
+
+function generatePreviewHTML(
+  codeFiles: Record<string, string>,
+  baseOrigin: string
+): string {
+  const entries = Object.entries(codeFiles);
+  const htmlEntry = entries.find(([fileName]) =>
+    ['html', 'htm'].includes(getFileExtension(fileName))
+  );
+  const cssCode = entries
+    .filter(([fileName]) => getFileExtension(fileName) === 'css')
+    .map(([, content]) => content)
+    .join('\n\n');
+
+  if (htmlEntry) {
+    const jsCode = entries
+      .filter(([fileName]) => ['js', 'mjs'].includes(getFileExtension(fileName)))
+      .map(([, content]) => content)
+      .join('\n\n');
+
+    return generateHtmlPreviewHTML(htmlEntry[1], cssCode, jsCode, baseOrigin);
+  }
+
+  const jsxEntry =
+    entries.find(([fileName]) =>
+      ['jsx', 'tsx'].includes(getFileExtension(fileName))
+    ) || ['Component.jsx', defaultCode.jsx];
+
+  return generateReactPreviewHTML(jsxEntry[1], cssCode, baseOrigin);
+}
+
+export function CodePlayground({ code, files }: CodePlaygroundProps) {
+  const initialCodeFiles = buildCodeFiles(code, files);
+  const [codeFiles, setCodeFiles] = useState(initialCodeFiles);
+  const [selectedFile, setSelectedFile] = useState(
+    Object.keys(initialCodeFiles)[0] || 'Component.jsx'
+  );
   const [previewKey, setPreviewKey] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const tabs = Object.keys(codeFiles);
   const currentCode = codeFiles[selectedFile as keyof typeof codeFiles] || '';
+  const fileTree = buildFileStructure(tabs);
+
+  useEffect(() => {
+    const nextCodeFiles = buildCodeFiles(code, files);
+    setCodeFiles(nextCodeFiles);
+    setSelectedFile(Object.keys(nextCodeFiles)[0] || 'Component.jsx');
+    setPreviewKey(prev => prev + 1);
+  }, [code, files]);
 
   const updatePreview = useCallback(() => {
     if (!iframeRef.current) return;
 
-    const jsxCode = codeFiles['Component.jsx'] || '';
-    const cssCode = codeFiles['styles.css'] || '';
-    const html = generatePreviewHTML(jsxCode, cssCode);
-
+    const html = generatePreviewHTML(codeFiles, window.location.origin);
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     iframeRef.current.src = url;
@@ -259,6 +362,7 @@ export function CodePlayground({ code }: CodePlaygroundProps) {
         target.selectionStart = target.selectionEnd = start + 2;
       }, 0);
     }
+
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       handleRunCode();
     }
@@ -266,26 +370,23 @@ export function CodePlayground({ code }: CodePlaygroundProps) {
 
   return (
     <div className="space-y-4">
-      {/* Preview */}
       <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-slate-900">
         <iframe
           ref={iframeRef}
           className="h-full w-full border-0"
           title="Code Preview"
-          sandbox="allow-scripts"
+          sandbox="allow-scripts allow-same-origin"
         />
       </div>
 
-      {/* Code Editor */}
       <div className="grid gap-4 lg:grid-cols-[240px_1fr]">
-        {/* File Structure */}
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-center gap-2 text-sm font-medium">
             <Folder className="h-4 w-4" />
             <span>構成 / File Structure</span>
           </div>
           <div className="mt-4">
-            {defaultFileStructure.map(node => (
+            {fileTree.map(node => (
               <FileTreeItem
                 key={node.name}
                 node={node}
@@ -296,30 +397,26 @@ export function CodePlayground({ code }: CodePlaygroundProps) {
           </div>
         </div>
 
-        {/* Code Viewer */}
-        <div className="rounded-xl border border-border bg-[#1e1e1e] overflow-hidden">
+        <div className="overflow-hidden rounded-xl border border-border bg-[#1e1e1e]">
           <div className="flex items-center justify-between border-b border-[#333] px-4 py-2">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-white/60">{'</>'}</span>
-              <span className="text-sm font-medium text-white">
-                Code Viewer
-              </span>
+              <span className="text-sm font-medium text-white">Code Viewer</span>
             </div>
             <button
               onClick={handleRunCode}
-              className="rounded-md bg-accent px-3 py-1 text-xs font-medium text-white hover:bg-accent/80 transition-colors"
+              className="rounded-md bg-sky-400 px-3 py-1 text-xs font-semibold text-slate-950 transition-colors hover:bg-sky-300"
             >
               Run
             </button>
           </div>
 
-          {/* Tabs */}
-          <div className="flex border-b border-[#333] overflow-x-auto">
+          <div className="flex overflow-x-auto border-b border-[#333]">
             {tabs.map(fileName => (
               <button
                 key={fileName}
                 onClick={() => setSelectedFile(fileName)}
-                className={`px-4 py-2 text-sm whitespace-nowrap border-b-2 transition-colors ${
+                className={`whitespace-nowrap border-b-2 px-4 py-2 text-sm transition-colors ${
                   selectedFile === fileName
                     ? 'border-accent text-accent'
                     : 'border-transparent text-white/60 hover:text-white/80'
@@ -330,24 +427,21 @@ export function CodePlayground({ code }: CodePlaygroundProps) {
             ))}
           </div>
 
-          {/* Code Editor */}
           <div className="relative max-h-80 overflow-auto">
             <div className="flex">
-              {/* Line Numbers */}
-              <div className="sticky left-0 select-none bg-[#1e1e1e] py-4 pl-4 pr-2 text-right text-sm font-mono text-white/30">
+              <div className="sticky left-0 select-none bg-[#1e1e1e] py-4 pl-4 pr-2 text-right font-mono text-sm text-white/30">
                 {currentCode.split('\n').map((_, i) => (
                   <div key={i} className="leading-6">
                     {i + 1}
                   </div>
                 ))}
               </div>
-              {/* Textarea */}
               <textarea
                 ref={textareaRef}
                 value={currentCode}
                 onChange={e => handleCodeChange(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="min-h-80 flex-1 resize-none overflow-hidden bg-transparent p-4 pl-2 font-mono text-sm text-white/90 leading-6 outline-none"
+                className="min-h-80 flex-1 resize-none overflow-hidden bg-transparent p-4 pl-2 font-mono text-sm leading-6 text-white/90 outline-none"
                 spellCheck={false}
               />
             </div>

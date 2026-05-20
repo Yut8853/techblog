@@ -5,10 +5,16 @@ import { getRelatedArticles } from '@/lib/articles';
 
 interface RelatedArticlesProps {
   currentSlug?: string;
+  excludeSlugs?: string[];
 }
 
-export function RelatedArticles({ currentSlug }: RelatedArticlesProps) {
-  const relatedArticles = getRelatedArticles(currentSlug || '', 3);
+export function RelatedArticles({
+  currentSlug,
+  excludeSlugs = [],
+}: RelatedArticlesProps) {
+  const relatedArticles = getRelatedArticles(currentSlug || '', 10)
+    .filter(article => !excludeSlugs.includes(article.slug))
+    .slice(0, 3);
 
   if (relatedArticles.length === 0) return null;
 
@@ -20,11 +26,12 @@ export function RelatedArticles({ currentSlug }: RelatedArticlesProps) {
           <Link
             key={article.slug}
             href={`/articles/${article.slug}`}
-            className="group rounded-xl border border-border bg-card overflow-hidden transition-all hover:shadow-md"
+            className="group overflow-hidden rounded-xl border border-border bg-card transition-all hover:shadow-md"
           >
-            <div className="aspect-video relative overflow-hidden bg-slate-900">
+            <div className="relative aspect-video overflow-hidden bg-slate-900">
               <CodeThumbnail
                 code={article.code}
+                files={article.files}
                 fallbackClass={article.thumbnail}
               />
             </div>
@@ -36,10 +43,10 @@ export function RelatedArticles({ currentSlug }: RelatedArticlesProps) {
                   </Badge>
                 ))}
               </div>
-              <h3 className="mt-2 font-medium text-sm line-clamp-2 text-blue-600 group-hover:underline">
+              <h3 className="mt-2 line-clamp-2 text-sm font-medium text-blue-600 group-hover:underline">
                 {article.title}
               </h3>
-              <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+              <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                 {article.description}
               </p>
               <p className="mt-2 text-xs text-muted-foreground">

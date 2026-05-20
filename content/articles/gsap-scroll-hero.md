@@ -6,6 +6,8 @@ tags:
   - GSAP
   - ScrollTrigger
   - アニメーション
+  - スクロール
+  - ストーリーテリング
 date: 2026年5月19日
 publishedAt: 2026-05-19
 readTime: 7分

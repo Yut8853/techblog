@@ -4,6 +4,7 @@ description: 奥行きのある背景パララックスに、見出しのテキ�
 category: パララックス系
 tags:
   - GSAP
+  - ScrollTrigger
   - アニメーション
   - スクロール
   - テキスト

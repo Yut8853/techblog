@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Abstract editorial gradient panel 4</title>
+  <desc id="desc">Self-authored floral-inspired illustration on deep rust background.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#6a2418"/>
+      <stop offset="100%" stop-color="#4d170f"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#8da37d"/>
+      <stop offset="100%" stop-color="#455544"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <g transform="translate(830 175)">
+    <path d="M-145 530C-110 348 -82 164 -16 0c54 132 79 303 68 567l-52 11z" fill="url(#leaf)"/>
+    <path d="M-28 530c46-147 80-325 145-492 31 154 14 318 -37 501l-47-9z" fill="url(#leaf)"/>
+    <path d="M130 564c31-121 51-272 103-408 34 113 36 243 -16 422l-87-14z" fill="url(#leaf)"/>
+    <path d="M-194 92c89-88 188-112 298-72-67 112-152 147-260 165-56-16-69-43-38-93z" fill="#6f737f"/>
+    <path d="M52 145c87-81 168-91 244-31-28 123-85 183-183 230-90-48-112-100-61-199z" fill="#4b4d61"/>
+    <path d="M164 42c58-48 122-48 193 6-8 112-48 180-136 218-78-33-103-81-57-224z" fill="#3f4151"/>
+  </g>
+</svg>

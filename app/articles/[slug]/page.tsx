@@ -68,9 +68,9 @@ export default async function ArticleDetailPage({
             />
 
             {/* Code Playground */}
-            {article.code && (
+            {(article.code || article.files.length > 0) && (
               <div className="mt-8">
-                <CodePlayground code={article.code} />
+                <CodePlayground code={article.code} files={article.files} />
               </div>
             )}
 
