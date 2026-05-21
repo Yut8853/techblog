@@ -71,10 +71,11 @@ pnpm build
 
 1. content/articles/\_template.md をコピー
 2. ファイル名を slug.md に変更
-3. frontmatter を埋める
-4. 本文を書く
-5. 必要なら files と code を入れる
-6. 動作確認
+3. content/articles/\_animation-inventory.md を見て既存表現の重複を避ける
+4. frontmatter を埋める
+5. 本文を書く
+6. 必要なら files と code を入れる
+7. 動作確認
 
 確認コマンド:
 
@@ -104,6 +105,12 @@ pnpm build
 - code
 
 publishedAt は YYYY-MM-DD 形式。
+
+## 記事ネタの重複回避
+
+- content/articles/\_animation-inventory.md を、記事化済みアニメーションの台帳として使う
+- 新規記事では「今回はこれ以外」を先に決めてから書き始める
+- 見た目だけでなく、主役モーションとトリガーが同じなら別記事にしない
 
 ## コードビューア仕様
 
