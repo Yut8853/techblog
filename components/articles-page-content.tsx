@@ -260,7 +260,7 @@ export function ArticlesPageContent({
           onClick={() => setPreviewArticle(null)}
         >
           <div
-            className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl"
+            className="flex max-h-[92vh] w-full max-w-7xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl"
             onClick={event => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4 border-b border-white/10 px-5 py-4 text-white">
@@ -296,8 +296,8 @@ export function ArticlesPageContent({
               </div>
             </div>
 
-            <div className="grid min-h-0 flex-1 gap-0 lg:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="min-h-[50vh] bg-slate-900">
+            <div className="grid min-h-0 flex-1 gap-0 xl:grid-cols-[minmax(0,1fr)_320px]">
+              <div className="min-h-[62vh] bg-slate-900 xl:min-h-[72vh]">
                 <CodeThumbnail
                   code={previewArticle.code}
                   files={previewArticle.files}
@@ -309,7 +309,7 @@ export function ArticlesPageContent({
                 />
               </div>
 
-              <div className="border-l border-white/10 bg-slate-950/95 p-5 text-sm text-slate-300">
+              <div className="border-t border-white/10 bg-slate-950/95 p-5 text-sm text-slate-300 xl:border-l xl:border-t-0">
                 <div className="flex flex-wrap gap-2">
                   {previewArticle.tags.map(tag => (
                     <Badge key={tag} variant="secondary" className="text-xs">
