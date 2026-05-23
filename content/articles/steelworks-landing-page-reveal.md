@@ -16,46 +16,206 @@ viewer: playground
 thumbnail: runtime
 layout: gallery
 files:
-  - name: index.html
-    language: html
+  - name: SteelworksLandingReveal.jsx
+    language: jsx
     content: |
-      <div class="preloader-overlay">
-        <div class="preloader"></div>
-      </div>
+      function SteelworksLandingReveal() {
+        const rootRef = React.useRef(null)
+        const images = [
+          '/images/steelworks-free/img-1.svg',
+          '/images/steelworks-free/img-2.svg',
+          '/images/steelworks-free/img-3.svg',
+          '/images/steelworks-free/img-4.svg',
+          '/images/steelworks-free/img-5.svg',
+        ]
+        const navItems = ['About', 'Work', 'Contact']
 
-      <nav>
-        <div class="nav-logo">
-          <a href="#">JUNK BRANDING</a>
-        </div>
+        React.useEffect(() => {
+          gsap.registerPlugin(CustomEase)
 
-        <div class="nav-items">
-        　<a href="#">About</a>
-          <a href="#">Work</a>
-          <a href="#">Contact</a>
+          CustomEase.create('hop', '0.9, 0, 0.1, 1')
+          CustomEase.create('glide', '0.8, 0, 0.2, 1')
 
-        </div>
-      </nav>
+          let isDisposed = false
+          let context
 
-      <section class="hero">
-        <div class="intro-img"><img src="/images/steelworks-free/img-1.svg" alt="" /></div>
-        <div class="intro-img"><img src="/images/steelworks-free/img-2.svg" alt="" /></div>
-        <div class="intro-img hero-img"><img src="/images/steelworks-free/img-3.svg" alt="" /></div>
-        <div class="intro-img"><img src="/images/steelworks-free/img-4.svg" alt="" /></div>
-        <div class="intro-img"><img src="/images/steelworks-free/img-5.svg" alt="" /></div>
+          const runAnimation = () => {
+            if (isDisposed || !rootRef.current) {
+              return
+            }
 
-        <div class="hero-content">
-          <div class="hero-header">
-            <h1>
-              JUNKBRANDING is a highly skilled web creator based in Ibaraki. We look forward to hearing from you.
-            </h1>
-          </div>
+            context = gsap.context(() => {
+              const introImages = gsap.utils.toArray('.intro-img')
+              const introImgScale = window.innerWidth <= 768 ? 0.32 : 0.2
+              const introImgGap = window.innerWidth <= 768 ? 16 : 40
+              const introImgRotations = [-15, 5, -7.5, 10, -2.5]
 
-          <div class="hero-social">
-            <p>Say Hello</p>
-            <a href="#">hello@junkbranding.com</a>
-          </div>
-        </div>
-      </section>
+              const introImgScaledWidth = window.innerWidth * introImgScale
+              const introImgRowWidth = introImgScaledWidth * introImages.length + introImgGap * (introImages.length - 1)
+              const introImgCenteredX = (window.innerWidth - introImgRowWidth) / 2
+              const introImgOffScreenX = introImgCenteredX - window.innerWidth * 1.3
+
+              introImages.forEach((img, index) => {
+                const centeredX =
+                  introImgCenteredX +
+                  index * (introImgScaledWidth + introImgGap) +
+                  introImgScaledWidth / 2 -
+                  window.innerWidth / 2
+
+                const offScreenX =
+                  introImgOffScreenX +
+                  index * (introImgScaledWidth + introImgGap) +
+                  introImgScaledWidth / 2 -
+                  window.innerWidth / 2
+
+                gsap.set(img, {
+                  scale: introImgScale,
+                  x: offScreenX,
+                  rotation: introImgRotations[index],
+                  borderRadius: '2.5rem',
+                })
+
+                img.dataset.centeredX = String(centeredX)
+              })
+
+              const timeline = gsap.timeline({ delay: 1 })
+
+              timeline.to('.preloader', {
+                scaleX: 1,
+                duration: 1.5,
+                ease: 'glide',
+                onComplete: () => {
+                  gsap.set('.preloader', { transformOrigin: 'right' })
+                },
+              })
+
+              timeline.to('.preloader', {
+                scaleX: 0,
+                duration: 1.25,
+                ease: 'hop',
+              })
+
+              timeline.to(
+                '.preloader-overlay',
+                {
+                  clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)',
+                  duration: 1,
+                  ease: 'hop',
+                },
+                '<0.75'
+              )
+
+              introImages.forEach(img => {
+                timeline.to(
+                  img,
+                  {
+                    x: parseFloat(img.dataset.centeredX || '0'),
+                    duration: 1.5,
+                    ease: 'glide',
+                  },
+                  '<0.025'
+                )
+              })
+
+              timeline.to(
+                '.intro-img:nth-of-type(1), .intro-img:nth-of-type(2)',
+                { x: '-100vw', duration: 1.5, ease: 'glide' },
+                'spread'
+              )
+              timeline.to(
+                '.intro-img:nth-of-type(4), .intro-img:nth-of-type(5)',
+                { x: '100vw', duration: 1.5, ease: 'glide' },
+                'spread'
+              )
+
+              timeline.to(
+                '.hero-img',
+                {
+                  scale: 1,
+                  x: 0,
+                  rotation: 0,
+                  borderRadius: 0,
+                  duration: 1.5,
+                  ease: 'glide',
+                },
+                '<'
+              )
+
+              timeline.to(
+                'nav a, .hero-header h1, .hero-social p, .hero-social a',
+                {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.85,
+                  stagger: 0.08,
+                  ease: 'power3.out',
+                },
+                '<0.65'
+              )
+            }, rootRef)
+          }
+
+          const ready = document.fonts?.ready ?? Promise.resolve()
+          ready.then(() => {
+            if (!isDisposed) {
+              runAnimation()
+            }
+          })
+
+          return () => {
+            isDisposed = true
+            if (context) {
+              context.revert()
+            }
+          }
+        }, [])
+
+        return (
+          <>
+            <div className="preloader-overlay">
+              <div className="preloader" />
+            </div>
+
+            <div ref={rootRef}>
+              <nav>
+                <div className="nav-logo">
+                  <a href="#">JUNK BRANDING</a>
+                </div>
+
+                <div className="nav-items">
+                  {navItems.map(item => (
+                    <a key={item} href="#">{item}</a>
+                  ))}
+                </div>
+              </nav>
+
+              <section className="hero">
+                {images.map((src, index) => (
+                  <div
+                    key={src}
+                    className={`intro-img${index === 2 ? ' hero-img' : ''}`}
+                  >
+                    <img src={src} alt="" />
+                  </div>
+                ))}
+
+                <div className="hero-content">
+                  <div className="hero-header">
+                    <h1>
+                      JUNKBRANDING is a highly skilled web creator based in Ibaraki. We look forward to hearing from you.
+                    </h1>
+                  </div>
+
+                  <div className="hero-social">
+                    <p>Say Hello</p>
+                    <a href="#">hello@junkbranding.com</a>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </>
+        )
+      }
   - name: styles.css
     language: css
     content: |
@@ -190,125 +350,337 @@ files:
           width: 100%;
         }
       }
-  - name: script.js
-    language: javascript
-    content: |
-      gsap.registerPlugin(CustomEase, SplitText)
+code:
+  jsx: |
+    function SteelworksLandingReveal() {
+      const rootRef = React.useRef(null)
+      const images = [
+        '/images/steelworks-free/img-1.svg',
+        '/images/steelworks-free/img-2.svg',
+        '/images/steelworks-free/img-3.svg',
+        '/images/steelworks-free/img-4.svg',
+        '/images/steelworks-free/img-5.svg',
+      ]
+      const navItems = ['About', 'Work', 'Contact']
 
-      CustomEase.create('hop', '0.9, 0, 0.1, 1')
-      CustomEase.create('glide', '0.8, 0, 0.2, 1')
+      React.useEffect(() => {
+        gsap.registerPlugin(CustomEase)
 
-      document.addEventListener('DOMContentLoaded', () => {
-        document.fonts.ready.then(() => {
-          const introImages = document.querySelectorAll('.intro-img')
-          const introImgScale = 0.2
-          const introImgGap = 40
-          const introImgRotations = [-15, 5, -7.5, 10, -2.5]
+        CustomEase.create('hop', '0.9, 0, 0.1, 1')
+        CustomEase.create('glide', '0.8, 0, 0.2, 1')
 
-          const introImgScaledWidth = window.innerWidth * introImgScale
-          const introImgRowWidth = introImgScaledWidth * 5 + introImgGap * 4
-          const introImgCenteredX = (window.innerWidth - introImgRowWidth) / 2
-          const introImgOffScreenX = introImgCenteredX - window.innerWidth * 1.3
+        let isDisposed = false
+        let context
 
-          introImages.forEach((img, i) => {
-            const centeredX =
-              introImgCenteredX +
-              i * (introImgScaledWidth + introImgGap) +
-              introImgScaledWidth / 2 -
-              window.innerWidth / 2
+        const runAnimation = () => {
+          if (isDisposed || !rootRef.current) {
+            return
+          }
 
-            const offScreenX =
-              introImgOffScreenX +
-              i * (introImgScaledWidth + introImgGap) +
-              introImgScaledWidth / 2 -
-              window.innerWidth / 2
+          context = gsap.context(() => {
+            const introImages = gsap.utils.toArray('.intro-img')
+            const introImgScale = window.innerWidth <= 768 ? 0.32 : 0.2
+            const introImgGap = window.innerWidth <= 768 ? 16 : 40
+            const introImgRotations = [-15, 5, -7.5, 10, -2.5]
 
-            gsap.set(img, {
-              scale: introImgScale,
-              x: offScreenX,
-              rotation: introImgRotations[i],
-              borderRadius: '2.5rem',
+            const introImgScaledWidth = window.innerWidth * introImgScale
+            const introImgRowWidth = introImgScaledWidth * introImages.length + introImgGap * (introImages.length - 1)
+            const introImgCenteredX = (window.innerWidth - introImgRowWidth) / 2
+            const introImgOffScreenX = introImgCenteredX - window.innerWidth * 1.3
+
+            introImages.forEach((img, index) => {
+              const centeredX =
+                introImgCenteredX +
+                index * (introImgScaledWidth + introImgGap) +
+                introImgScaledWidth / 2 -
+                window.innerWidth / 2
+
+              const offScreenX =
+                introImgOffScreenX +
+                index * (introImgScaledWidth + introImgGap) +
+                introImgScaledWidth / 2 -
+                window.innerWidth / 2
+
+              gsap.set(img, {
+                scale: introImgScale,
+                x: offScreenX,
+                rotation: introImgRotations[index],
+                borderRadius: '2.5rem',
+              })
+
+              img.dataset.centeredX = String(centeredX)
             })
 
-            img.dataset.centeredX = centeredX
-          })
+            const timeline = gsap.timeline({ delay: 1 })
 
-          const tl = gsap.timeline({ delay: 1 })
+            timeline.to('.preloader', {
+              scaleX: 1,
+              duration: 1.5,
+              ease: 'glide',
+              onComplete: () => {
+                gsap.set('.preloader', { transformOrigin: 'right' })
+              },
+            })
 
-          tl.to('.preloader', {
-            scaleX: 1,
-            duration: 1.5,
-            ease: 'glide',
-            onComplete: () => {
-              gsap.set('.preloader', { transformOrigin: 'right' })
-            },
-          })
-
-          tl.to('.preloader', {
-            scaleX: 0,
-            duration: 1.25,
-            ease: 'hop',
-          })
-
-          tl.to(
-            '.preloader-overlay',
-            {
-              clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)',
-              duration: 1,
+            timeline.to('.preloader', {
+              scaleX: 0,
+              duration: 1.25,
               ease: 'hop',
-            },
-            '<0.75',
-          )
+            })
 
-          introImages.forEach(img => {
-            tl.to(
-              img,
+            timeline.to(
+              '.preloader-overlay',
               {
-                x: parseFloat(img.dataset.centeredX),
+                clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)',
+                duration: 1,
+                ease: 'hop',
+              },
+              '<0.75'
+            )
+
+            introImages.forEach(img => {
+              timeline.to(
+                img,
+                {
+                  x: parseFloat(img.dataset.centeredX || '0'),
+                  duration: 1.5,
+                  ease: 'glide',
+                },
+                '<0.025'
+              )
+            })
+
+            timeline.to(
+              '.intro-img:nth-of-type(1), .intro-img:nth-of-type(2)',
+              { x: '-100vw', duration: 1.5, ease: 'glide' },
+              'spread'
+            )
+            timeline.to(
+              '.intro-img:nth-of-type(4), .intro-img:nth-of-type(5)',
+              { x: '100vw', duration: 1.5, ease: 'glide' },
+              'spread'
+            )
+
+            timeline.to(
+              '.hero-img',
+              {
+                scale: 1,
+                x: 0,
+                rotation: 0,
+                borderRadius: 0,
                 duration: 1.5,
                 ease: 'glide',
               },
-              '<0.025',
+              '<'
             )
-          })
 
-          tl.to(
-            '.intro-img:nth-of-type(1), .intro-img:nth-of-type(2)',
-            { x: '-100vw', duration: 1.5, ease: 'glide' },
-            'spread',
-          )
-          tl.to(
-            '.intro-img:nth-of-type(4), .intro-img:nth-of-type(5)',
-            { x: '100vw', duration: 1.5, ease: 'glide' },
-            'spread',
-          )
+            timeline.to(
+              'nav a, .hero-header h1, .hero-social p, .hero-social a',
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.85,
+                stagger: 0.08,
+                ease: 'power3.out',
+              },
+              '<0.65'
+            )
+          }, rootRef)
+        }
 
-          tl.to(
-            '.hero-img',
-            {
-              scale: 1,
-              x: 0,
-              rotation: 0,
-              borderRadius: 0,
-              duration: 1.5,
-              ease: 'glide',
-            },
-            '<',
-          )
-
-          tl.to(
-            'nav a, .hero-header h1, .hero-social p, .hero-social a',
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.85,
-              stagger: 0.08,
-              ease: 'power3.out',
-            },
-            '<0.65',
-          )
+        const ready = document.fonts?.ready ?? Promise.resolve()
+        ready.then(() => {
+          if (!isDisposed) {
+            runAnimation()
+          }
         })
-      })
+
+        return () => {
+          isDisposed = true
+          if (context) {
+            context.revert()
+          }
+        }
+      }, [])
+
+      return (
+        <>
+          <div className="preloader-overlay">
+            <div className="preloader" />
+          </div>
+
+          <div ref={rootRef}>
+            <nav>
+              <div className="nav-logo">
+                <a href="#">JUNK BRANDING</a>
+              </div>
+
+              <div className="nav-items">
+                {navItems.map(item => (
+                  <a key={item} href="#">{item}</a>
+                ))}
+              </div>
+            </nav>
+
+            <section className="hero">
+              {images.map((src, index) => (
+                <div
+                  key={src}
+                  className={`intro-img${index === 2 ? ' hero-img' : ''}`}
+                >
+                  <img src={src} alt="" />
+                </div>
+              ))}
+
+              <div className="hero-content">
+                <div className="hero-header">
+                  <h1>
+                    JUNKBRANDING is a highly skilled web creator based in Ibaraki. We look forward to hearing from you.
+                  </h1>
+                </div>
+
+                <div className="hero-social">
+                  <p>Say Hello</p>
+                  <a href="#">hello@junkbranding.com</a>
+                </div>
+              </div>
+            </section>
+          </div>
+        </>
+      )
+    }
+  css: |
+    @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "DM Sans", sans-serif;
+    }
+
+    h1 {
+      color: #fff;
+      font-size: 3rem;
+      font-weight: 400;
+      letter-spacing: -1%;
+      line-height: 1.1;
+    }
+
+    a,
+    p {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 400;
+      letter-spacing: -1%;
+      display: block;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      z-index: 2;
+    }
+
+    .nav-items {
+      display: flex;
+      gap: 4rem;
+    }
+
+    .preloader-overlay {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 100svh;
+      background-color: #0f0f0f;
+      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+      z-index: 10;
+    }
+
+    .preloader-overlay .preloader {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 0.5rem;
+      background-color: #fff;
+      transform: scaleX(0);
+      transform-origin: left;
+      will-change: transform;
+    }
+
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100svh;
+      overflow: hidden;
+    }
+
+    .intro-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 0.5rem;
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    .hero-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100svh;
+      padding: 15svh 2rem 15svh 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 2;
+    }
+
+    .hero-header {
+      width: 60%;
+    }
+
+    nav a,
+    .hero-header h1,
+    .hero-social p,
+    .hero-social a {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    @media (max-width: 1000px) {
+      .nav-items {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0;
+      }
+
+      .hero-content {
+        padding: 15svh 2rem 2rem 2rem;
+      }
+
+      .hero-header {
+        width: 100%;
+      }
+    }
 ---
 
 ## はじめに
@@ -323,7 +695,21 @@ files:
 - CSS は固定ナビゲーション、プリローダー、全面配置の土台を作る
 - JavaScript は GSAP で初期位置、整列、左右退避、中央拡大を時系列で制御する
 
-最初から横並び DOM にしていないのが重要。全要素を全画面で重ねておいて、`gsap.set()` で scale と x を与えて整列状態を作るから、そのまま中央1枚の全画面復帰までつなげやすい。
+最初から横並び DOM にしていないのが重要。全画面で重ねた状態から `gsap.set()` で整列を作る方が、そのまま中央 1 枚の全面復帰までつなげやすい。
+
+## 組み合わせのポイント
+
+- プリローダー、整列、左右退避、中央拡大を 1 本の流れとして見せる
+- 5 枚の画像は最初に束感を持たせておき、整列で秩序を作ってから崩す
+- 画像演出を先に終わらせて、テキストは最後に出して焦点を守る
+- 全画面レイヤーと固定ナビを重ねて、ブランド LP らしい密度を作る
+
+## 実装のポイント
+
+- 画像は最初から横並びにせず、全画面重ね置きから `gsap.set()` で整列位置を作る
+- 到着位置と開始位置を別々に計算して、整列と退避の両方に使い回す
+- 真ん中の 1 枚だけ別クラスを持たせて、最後の拡張対象を明確にする
+- テキストの表示は画像タイムラインの終盤へ寄せて、視線の分散を防ぐ
 
 ## GSAP タイムラインの流れ
 
@@ -335,7 +721,7 @@ files:
 4. 真ん中の `.hero-img` だけを scale `1`、rotation `0`、borderRadius `0` に戻す
 5. 最後に nav とテキストを順番にフェードアップさせる
 
-要するに、画像演出を先に終わらせてから文字を出している。この順番にしておくと、最初の視線が分散しにくい。
+要するに、画像演出を先に終わらせてから文字を出す。この順番なら最初の視線が散りにくい。
 
 ## 画像リビールで気をつける点
 
@@ -344,16 +730,16 @@ files:
 - 文字要素は最後に出して、演出の焦点を分散させない
 - モバイルでは余白と画像幅がすぐ破綻するので、縮尺とギャップを早めに見直す
 
-補足メモとして、`introImgScale` と `introImgGap` はかなり見た目を支配する。ここが合っていないと、整列の気持ちよさがすぐ崩れる。とくに画面幅ベースで計算しているので、モバイル確認は必須。
+補足として、`introImgScale` と `introImgGap` は見た目への影響が大きい。ここがずれると整列の気持ちよさが崩れるので、画面幅ベースの計算はモバイル確認まで含めて見る。
 
-あと、重要なのはテキストの出現タイミングで、行分割そのものは別手段でも置き換えられる。
+テキストの出現タイミングも重要。行分割の手段より、いつ文字を出すかの方を優先して見る。
 
 ## まとめ
 
-今回のコードで覚えておくことは3つだけでいい。
+今回のコードで覚えておくことは 3 つだけ。
 
 - 全画面レイヤーをあとから整列状態に見せる
 - 左右を逃がして中央だけ残す
 - テキストは最後に出して演出の焦点を守る
 
-ブランド系の LP で、最初の数秒だけ強く見せたいときの組み立てとして再利用しやすい。
+ブランド系 LP の最初の数秒だけ強く見せたいときの組み立てとして再利用する。
