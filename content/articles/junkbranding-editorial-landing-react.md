@@ -20,7 +20,6 @@ files:
     content: |
       function JunkBrandingLanding() {
         const rootRef = React.useRef(null)
-        const isPreview = typeof window !== 'undefined' && window.self !== window.top
         const backdropRows = [
           [
             ['JUNKBRANDING', 'JUNKBRANDING', 'JUNKBRANDING', 'JUNKBRANDING'],
@@ -40,10 +39,6 @@ files:
         ]
 
         React.useEffect(() => {
-          if (isPreview) {
-            return
-          }
-
           const ctx = gsap.context(() => {
             gsap.set('.jb-copy-line, .jb-status-line, .jb-hero-word', {
               yPercent: 100,
@@ -132,10 +127,10 @@ files:
           }, rootRef)
 
           return () => ctx.revert()
-        }, [isPreview])
+        }, [])
 
         return (
-          <section ref={rootRef} className={`jb-landing${isPreview ? ' jb-preview-mode' : ''}`}>
+          <section ref={rootRef} className="jb-landing">
             <div className="jb-preloader-backdrop" aria-hidden="true">
               {backdropRows.map((columns, rowIndex) => (
                 <div key={`row-${rowIndex}`} className="jb-backdrop-row">
@@ -430,23 +425,6 @@ files:
         color: rgba(255, 255, 255, 0.65);
       }
 
-      .jb-preview-mode .jb-preloader-backdrop,
-      .jb-preview-mode .jb-preloader {
-        display: none;
-      }
-
-      .jb-preview-mode .jb-hero {
-        transform: none;
-      }
-
-      .jb-preview-mode .jb-hero-revealer {
-        clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
-      }
-
-      .jb-preview-mode .jb-hero-word {
-        transform: translateY(0%);
-      }
-
       @media (max-width: 1000px) {
         .jb-backdrop-row .jb-backdrop-col:nth-child(1),
         .jb-backdrop-row .jb-backdrop-col:nth-child(2),
@@ -475,7 +453,6 @@ code:
   jsx: |
     function JunkBrandingLanding() {
       const rootRef = React.useRef(null)
-      const isPreview = typeof window !== 'undefined' && window.self !== window.top
       const backdropRows = [
         [
           ['JUNKBRANDING', 'JUNKBRANDING', 'JUNKBRANDING', 'JUNKBRANDING'],
@@ -495,10 +472,6 @@ code:
       ]
 
       React.useEffect(() => {
-        if (isPreview) {
-          return
-        }
-
         const ctx = gsap.context(() => {
           gsap.set('.jb-copy-line, .jb-status-line, .jb-hero-word', {
             yPercent: 100,
@@ -584,10 +557,10 @@ code:
         }, rootRef)
 
         return () => ctx.revert()
-      }, [isPreview])
+      }, [])
 
       return (
-        <section ref={rootRef} className={`jb-landing${isPreview ? ' jb-preview-mode' : ''}`}>
+        <section ref={rootRef} className="jb-landing">
           <div className="jb-preloader-backdrop" aria-hidden="true">
             {backdropRows.map((columns, rowIndex) => (
               <div key={`row-${rowIndex}`} className="jb-backdrop-row">
@@ -864,23 +837,6 @@ code:
 
     .jb-hero-meta {
       color: rgba(255, 255, 255, 0.65);
-    }
-
-    .jb-preview-mode .jb-preloader-backdrop,
-    .jb-preview-mode .jb-preloader {
-      display: none;
-    }
-
-    .jb-preview-mode .jb-hero {
-      transform: none;
-    }
-
-    .jb-preview-mode .jb-hero-revealer {
-      clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
-    }
-
-    .jb-preview-mode .jb-hero-word {
-      transform: translateY(0%);
     }
 
     @media (max-width: 1000px) {
