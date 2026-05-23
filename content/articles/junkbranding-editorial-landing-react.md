@@ -19,1345 +19,894 @@ files:
     language: jsx
     content: |
       function JunkBrandingLanding() {
-        const shellRef = React.useRef(null)
-        const titleChars = 'JUNKBRANDING'.split('')
-        const navItems = ['テキスト', 'テキスト', 'テキスト']
-        const metrics = ['テキストテキスト、、、', 'テキストテキスト、、、', 'テキストテキスト、、、']
-        const panels = [
-          'テキストテキスト、、、',
-          'テキストテキスト、、、',
-          'テキストテキスト、、、',
+        const rootRef = React.useRef(null)
+        const isPreview = typeof window !== 'undefined' && window.self !== window.top
+        const backdropRows = [
+          [
+            ['JUNKBRANDING', 'JUNKBRANDING', 'JUNKBRANDING', 'JUNKBRANDING'],
+            ['テキストテキスト、、、', 'テキストテキスト、、、'],
+            ['テキストテキスト、、、', 'テキストテキスト、、、'],
+            ['JUNKBRANDING'],
+            [':::..:::.::::..:::'],
+          ],
+          [
+            ['テキストテキスト、、、'],
+            ['// / / ///// / / / ///'],
+            ['JUNKBRANDING / 17%'],
+            ['テキストテキスト、、、', 'テキストテキスト、、、'],
+            ['テキストテキスト、、、', 'テキストテキスト、、、'],
+            ['JB-01'],
+          ],
         ]
 
         React.useEffect(() => {
+          if (isPreview) {
+            return
+          }
+
           const ctx = gsap.context(() => {
-            gsap.set(
-              [
-                '.jb-badge',
-                '.jb-nav-link',
-                '.jb-char',
-                '.jb-copy',
-                '.jb-action',
-                '.jb-metric',
-                '.jb-panel',
-                '.jb-footer-copy',
-              ],
-              {
-                opacity: 0,
-                y: 30,
-              }
-            )
-
-            gsap.set('.jb-visual-card', {
-              opacity: 0,
-              y: 54,
-              rotate: -5,
-              scale: 0.94,
+            gsap.set('.jb-copy-line, .jb-status-line, .jb-hero-word', {
+              yPercent: 100,
             })
 
-            gsap.set('.jb-orbit', {
-              scale: 0.8,
-              opacity: 0,
+            gsap.set('.jb-circle-track, .jb-circle-progress', {
+              strokeDasharray: 974,
+              strokeDashoffset: 974,
             })
 
-            gsap.timeline({ defaults: { ease: 'power3.out' } })
-              .to('.jb-badge', {
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
+            const timeline = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.6 })
+
+            timeline
+              .to('.jb-copy-line', {
+                yPercent: 0,
+                duration: 0.72,
+                stagger: 0.035,
               })
               .to(
-                '.jb-nav-link',
+                '.jb-circle-track',
                 {
-                  opacity: 1,
-                  y: 0,
-                  duration: 0.55,
-                  stagger: 0.08,
+                  strokeDashoffset: 0,
+                  duration: 1.75,
+                  ease: 'power2.inOut',
                 },
-                0.08
+                '<'
               )
               .to(
-                '.jb-char',
+                '.jb-circle-progress',
                 {
-                  opacity: 1,
-                  y: 0,
-                  duration: 0.48,
-                  stagger: 0.03,
+                  strokeDashoffset: 140,
+                  duration: 1.75,
+                  ease: 'power2.inOut',
                 },
-                0.14
+                '<0.08'
               )
               .to(
-                '.jb-copy',
+                '.jb-status-line',
                 {
-                  opacity: 1,
-                  y: 0,
-                  duration: 0.6,
-                  stagger: 0.08,
-                },
-                0.34
-              )
-              .to(
-                '.jb-action',
-                {
-                  opacity: 1,
-                  y: 0,
-                  duration: 0.55,
-                  stagger: 0.08,
-                },
-                0.44
-              )
-              .to(
-                '.jb-orbit',
-                {
-                  opacity: 1,
-                  scale: 1,
-                  duration: 0.7,
+                  yPercent: 0,
+                  duration: 0.72,
                   stagger: 0.06,
                 },
-                0.28
+                '-=0.72'
+              )
+              .to('.jb-preloader-shell', {
+                scale: 0.92,
+                duration: 1.2,
+                ease: 'power2.inOut',
+              })
+              .to(
+                '.jb-preloader',
+                {
+                  clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
+                  duration: 1.25,
+                  ease: 'power4.inOut',
+                }
               )
               .to(
-                '.jb-visual-card',
+                '.jb-hero-revealer',
                 {
-                  opacity: 1,
-                  y: 0,
-                  rotate: 0,
+                  clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
+                  duration: 1.25,
+                  ease: 'power4.inOut',
+                },
+                '<'
+              )
+              .to(
+                '.jb-hero',
+                {
                   scale: 1,
-                  duration: 0.8,
-                  stagger: 0.12,
+                  duration: 1.2,
+                  ease: 'power4.out',
                 },
-                0.24
+                '<0.06'
               )
               .to(
-                '.jb-metric',
+                '.jb-hero-word',
                 {
-                  opacity: 1,
-                  y: 0,
-                  duration: 0.56,
-                  stagger: 0.08,
+                  yPercent: 0,
+                  duration: 0.95,
+                  ease: 'power3.out',
                 },
-                0.56
+                '<0.12'
               )
-              .to(
-                '.jb-panel',
-                {
-                  opacity: 1,
-                  y: 0,
-                  duration: 0.62,
-                  stagger: 0.08,
-                },
-                0.64
-              )
-              .to(
-                '.jb-footer-copy',
-                {
-                  opacity: 1,
-                  y: 0,
-                  duration: 0.55,
-                },
-                0.82
-              )
-          }, shellRef)
+          }, rootRef)
 
           return () => ctx.revert()
-        }, [])
+        }, [isPreview])
 
         return (
-          <section ref={shellRef} className="jb-shell">
-            <div className="jb-grid" aria-hidden="true" />
-            <div className="jb-glow jb-glow-a" aria-hidden="true" />
-            <div className="jb-glow jb-glow-b" aria-hidden="true" />
-
-            <header className="jb-nav">
-              <a className="jb-brand" href="#">JUNKBRANDING</a>
-              <nav className="jb-nav-links" aria-label="primary">
-                {navItems.map((item, index) => (
-                  <a key={`${item}-${index}`} className="jb-nav-link" href="#">
-                    {item}
-                  </a>
-                ))}
-              </nav>
-            </header>
-
-            <div className="jb-hero">
-              <div className="jb-copy-column">
-                <p className="jb-badge">テキストテキスト、、、</p>
-
-                <h1 className="jb-title" aria-label="JUNKBRANDING">
-                  {titleChars.map((char, index) => (
-                    <span key={`${char}-${index}`} className="jb-char">
-                      {char}
-                    </span>
+          <section ref={rootRef} className={`jb-landing${isPreview ? ' jb-preview-mode' : ''}`}>
+            <div className="jb-preloader-backdrop" aria-hidden="true">
+              {backdropRows.map((columns, rowIndex) => (
+                <div key={`row-${rowIndex}`} className="jb-backdrop-row">
+                  {columns.map((lines, columnIndex) => (
+                    <div key={`col-${rowIndex}-${columnIndex}`} className="jb-backdrop-col">
+                      {columnIndex === 3 && rowIndex === 0 ? (
+                        <div className="jb-logo-mark" />
+                      ) : (
+                        lines.map((line, lineIndex) => <p key={`line-${lineIndex}`}>{line}</p>)
+                      )}
+                    </div>
                   ))}
-                </h1>
-
-                <p className="jb-copy">テキストテキスト、、、 テキストテキスト、、、 テキストテキスト、、、</p>
-                <p className="jb-copy">テキストテキスト、、、 テキストテキスト、、、</p>
-
-                <div className="jb-actions">
-                  <a className="jb-action jb-primary" href="#">テキスト</a>
-                  <a className="jb-action jb-secondary" href="#">テキスト</a>
                 </div>
+              ))}
+            </div>
 
-                <ul className="jb-metrics">
-                  {metrics.map((metric, index) => (
-                    <li key={`${metric}-${index}`} className="jb-metric">
-                      <span>JUNKBRANDING</span>
-                      <strong>JUNKBRANDING</strong>
-                      <p>{metric}</p>
-                    </li>
-                  ))}
-                </ul>
+            <div className="jb-preloader">
+              <div className="jb-preloader-row">
+                <p><span className="jb-copy-line">JUNKBRANDING</span></p>
               </div>
 
-              <div className="jb-visual-column">
-                <div className="jb-orbit jb-orbit-a" aria-hidden="true" />
-                <div className="jb-orbit jb-orbit-b" aria-hidden="true" />
-                <div className="jb-orbit jb-orbit-c" aria-hidden="true" />
+              <div className="jb-preloader-row">
+                <div className="jb-preloader-col">
+                  <div className="jb-preloader-sub-col">
+                    <p><span className="jb-copy-line">テキスト</span></p>
+                    <p><span className="jb-copy-line">テキスト</span></p>
+                  </div>
 
-                <article className="jb-visual-card jb-visual-card-main">
-                  <p>JUNKBRANDING</p>
-                  <h2>JUNKBRANDING</h2>
-                  <span>テキストテキスト、、、</span>
-                </article>
-
-                <article className="jb-visual-card jb-visual-card-side">
-                  <p>JUNKBRANDING</p>
-                  <h2>JUNKBRANDING</h2>
-                  <span>テキストテキスト、、、</span>
-                </article>
-
-                <div className="jb-panel-stack">
-                  {panels.map((panel, index) => (
-                    <article key={`${panel}-${index}`} className="jb-panel">
-                      <p>JUNKBRANDING</p>
-                      <h3>JUNKBRANDING</h3>
-                      <span>{panel}</span>
-                    </article>
-                  ))}
+                  <div className="jb-preloader-sub-col">
+                    <p><span className="jb-copy-line">テキスト</span></p>
+                    <p><span className="jb-copy-line">テキスト</span></p>
+                  </div>
                 </div>
+
+                <div className="jb-preloader-col">
+                  <p><span className="jb-copy-line">JB-01</span></p>
+                </div>
+              </div>
+
+              <div className="jb-preloader-shell" aria-hidden="true">
+                <div className="jb-logo-core" />
+                <div className="jb-status-copy">
+                  <span className="jb-status-line">JUNKBRANDING</span>
+                </div>
+                <div className="jb-status-copy jb-status-copy-outro">
+                  <span className="jb-status-line">テキストテキスト、、、</span>
+                </div>
+
+                <svg viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle
+                    className="jb-circle-track"
+                    cx="160"
+                    cy="160"
+                    r="155"
+                    stroke="#2b2b2b"
+                    strokeWidth="2"
+                  />
+                  <circle
+                    className="jb-circle-progress"
+                    cx="160"
+                    cy="160"
+                    r="155"
+                    stroke="#fff"
+                    strokeWidth="2"
+                  />
+                </svg>
               </div>
             </div>
 
-            <footer className="jb-footer">
-              <p className="jb-footer-copy">テキストテキスト、、、 テキストテキスト、、、 テキストテキスト、、、</p>
-              <a className="jb-footer-link" href="#">JUNKBRANDING</a>
-            </footer>
+            <section className="jb-hero">
+              <div className="jb-hero-revealer" aria-hidden="true" />
+              <h1>
+                <span className="jb-word-wrap">
+                  <span className="jb-hero-word">JUNKBRANDING</span>
+                </span>
+              </h1>
+              <p className="jb-hero-meta">テキストテキスト、、、</p>
+            </section>
           </section>
         )
       }
   - name: styles.css
     language: css
     content: |
-      @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Geist+Mono:wght@400;500;700&display=swap");
 
       :root {
-        color-scheme: dark;
-        --bg: #0a0b10;
-        --panel: rgba(15, 17, 24, 0.76);
-        --panel-strong: rgba(23, 26, 36, 0.92);
-        --line: rgba(255, 255, 255, 0.12);
-        --text: #f8f4ed;
-        --muted: rgba(248, 244, 237, 0.68);
-        --accent: #ff855f;
-        --accent-soft: rgba(255, 133, 95, 0.2);
+        --base-100: #ffffff;
+        --base-200: #7a7a7a;
+        --base-300: #000000;
       }
 
       * {
+        margin: 0;
+        padding: 0;
         box-sizing: border-box;
       }
 
       body {
         min-height: 100vh;
-        margin: 0;
-        padding: 20px;
-        font-family: "Manrope", sans-serif;
-        color: var(--text);
-        background:
-          radial-gradient(circle at 18% 18%, rgba(255, 133, 95, 0.2), transparent 28%),
-          radial-gradient(circle at 82% 22%, rgba(255, 214, 10, 0.12), transparent 24%),
-          linear-gradient(160deg, #08090d 0%, #11131a 52%, #0b0c11 100%);
-      }
-
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      .jb-shell {
-        position: relative;
-        width: min(1220px, 100%);
-        margin: 0 auto;
+        background: var(--base-300);
+        color: var(--base-100);
         overflow: hidden;
-        border: 1px solid var(--line);
-        border-radius: 34px;
-        background: linear-gradient(180deg, rgba(10, 11, 16, 0.94), rgba(10, 11, 16, 0.72));
-        box-shadow: 0 30px 120px rgba(0, 0, 0, 0.4);
       }
 
-      .jb-grid {
-        position: absolute;
-        inset: 0;
-        background-image:
-          linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-        background-size: 30px 30px;
-        opacity: 0.22;
-        mask-image: radial-gradient(circle at center, black, transparent 84%);
+      p {
+        text-transform: uppercase;
+        font-family: "Geist Mono", monospace;
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1;
       }
 
-      .jb-glow {
-        position: absolute;
-        border-radius: 999px;
-        filter: blur(18px);
-        pointer-events: none;
+      h1 {
+        width: 90%;
+        text-transform: uppercase;
+        font-family: "Barlow Condensed", sans-serif;
+        font-size: clamp(5rem, 15vw, 15rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 0.8;
       }
 
-      .jb-glow-a {
-        top: -80px;
-        right: -40px;
-        width: 260px;
-        height: 260px;
-        background: rgba(255, 133, 95, 0.18);
+      .jb-word-wrap,
+      .jb-status-copy,
+      .jb-preloader p {
+        display: block;
+        overflow: hidden;
       }
 
-      .jb-glow-b {
-        bottom: -100px;
-        left: -40px;
-        width: 300px;
-        height: 300px;
-        background: rgba(255, 214, 10, 0.1);
+      .jb-copy-line,
+      .jb-status-line,
+      .jb-hero-word {
+        display: inline-block;
+        will-change: transform;
       }
 
-      .jb-nav,
-      .jb-footer {
+      .jb-landing {
         position: relative;
-        z-index: 1;
+        min-height: 100vh;
+        background: var(--base-300);
+      }
+
+      .jb-preloader-backdrop {
+        position: fixed;
+        inset: 0;
         display: flex;
-        align-items: center;
+        flex-direction: column;
         justify-content: space-between;
-        gap: 24px;
-        padding: 26px 30px;
+        background: var(--base-100);
+        color: var(--base-200);
+        z-index: 0;
       }
 
-      .jb-nav {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      }
-
-      .jb-brand,
-      .jb-title,
-      .jb-visual-card h2,
-      .jb-panel h3,
-      .jb-metric strong,
-      .jb-footer-link {
-        font-family: "Syne", sans-serif;
-      }
-
-      .jb-brand,
-      .jb-footer-link {
-        font-size: 0.95rem;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-      }
-
-      .jb-nav-links {
+      .jb-backdrop-row,
+      .jb-preloader-row {
+        width: 100%;
+        padding: 1.5rem;
         display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 20px;
+        justify-content: space-between;
+        gap: 1rem;
       }
 
-      .jb-nav-link,
-      .jb-footer-copy,
-      .jb-copy,
-      .jb-metric p,
-      .jb-panel span,
-      .jb-visual-card span,
-      .jb-visual-card p {
-        color: var(--muted);
+      .jb-backdrop-row:last-child {
+        align-items: flex-end;
       }
 
-      .jb-nav-link,
-      .jb-badge,
-      .jb-metric span,
-      .jb-panel p,
-      .jb-visual-card p {
-        font-size: 0.76rem;
-        letter-spacing: 0.24em;
-        text-transform: uppercase;
+      .jb-backdrop-col,
+      .jb-preloader-col {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+
+      .jb-preloader-col {
+        flex-direction: row;
+        align-items: flex-end;
+        gap: 6rem;
+      }
+
+      .jb-preloader-sub-col {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+
+      .jb-logo-mark,
+      .jb-logo-core {
+        position: relative;
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 1px dashed currentColor;
+      }
+
+      .jb-logo-mark::before,
+      .jb-logo-mark::after,
+      .jb-logo-core::before,
+      .jb-logo-core::after {
+        content: "";
+        position: absolute;
+        inset: 0.32rem;
+        border: 2px solid currentColor;
+      }
+
+      .jb-logo-mark::after,
+      .jb-logo-core::after {
+        inset: 0.68rem;
+        background: currentColor;
+      }
+
+      .jb-preloader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: var(--base-300);
+        color: var(--base-100);
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        z-index: 2;
+      }
+
+      .jb-preloader-shell {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20rem;
+        height: 20rem;
+        transform: translate(-50%, -50%);
+      }
+
+      .jb-logo-core,
+      .jb-status-copy,
+      .jb-preloader-shell svg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .jb-logo-core {
+        width: 4rem;
+        height: 4rem;
+      }
+
+      .jb-status-copy {
+        font-family: "Geist Mono", monospace;
+        font-size: 0.9rem;
+      }
+
+      .jb-status-copy-outro {
+        top: calc(50% + 1.5rem);
+        opacity: 0.65;
+      }
+
+      .jb-preloader-shell svg {
+        width: 100%;
+        height: 100%;
       }
 
       .jb-hero {
         position: relative;
-        z-index: 1;
-        display: grid;
-        grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
-        align-items: start;
-        gap: 24px;
-        padding: 34px 30px 20px;
-      }
-
-      .jb-copy-column {
+        width: 100%;
+        height: 100svh;
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        min-height: clamp(520px, 70vh, 640px);
-      }
-
-      .jb-badge {
-        display: inline-flex;
-        align-self: flex-start;
-        padding: 0.62rem 0.9rem;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.04);
-        color: rgba(248, 244, 237, 0.84);
-      }
-
-      .jb-title {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 0.06em;
-        max-width: none;
-        margin: 18px 0 0;
-        font-size: clamp(2.8rem, 5.4vw, 5rem);
-        line-height: 0.9;
-        letter-spacing: -0.08em;
-      }
-
-      .jb-char {
-        display: inline-block;
-        background: linear-gradient(180deg, #fff8ef 0%, #ffcf8c 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-
-      .jb-copy {
-        max-width: 30rem;
-        margin: 18px 0 0;
-        line-height: 1.8;
-        font-size: 1rem;
-      }
-
-      .jb-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-        margin-top: 28px;
-      }
-
-      .jb-action {
-        display: inline-flex;
-        align-items: center;
         justify-content: center;
-        min-width: 170px;
-        min-height: 54px;
-        border-radius: 999px;
-        padding: 0 1.2rem;
-        font-weight: 700;
+        align-items: center;
+        gap: 1.25rem;
+        text-align: center;
+        background: var(--base-300);
+        color: var(--base-100);
+        transform: scale(0.75);
+        will-change: transform;
       }
 
-      .jb-primary {
-        color: #18120f;
-        background: linear-gradient(135deg, #ffe6ca 0%, #ff855f 100%);
+      .jb-hero-revealer {
+        position: absolute;
+        inset: 0;
+        background: var(--base-100);
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
       }
 
-      .jb-secondary {
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        background: rgba(255, 255, 255, 0.03);
-      }
-
-      .jb-metrics {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-        margin: auto 0 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      .jb-metric {
-        padding: 18px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 22px;
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(12px);
-      }
-
-      .jb-metric strong,
-      .jb-panel h3,
-      .jb-visual-card h2 {
-        display: block;
-        margin-top: 12px;
-        font-size: clamp(1.2rem, 2vw, 1.8rem);
-        line-height: 1;
-        letter-spacing: -0.05em;
-      }
-
-      .jb-metric p {
-        margin: 12px 0 0;
-        line-height: 1.6;
-      }
-
-      .jb-visual-column {
+      .jb-hero h1,
+      .jb-hero-meta {
         position: relative;
-        min-height: clamp(520px, 68vh, 640px);
-        padding: 8px 0 0;
+        z-index: 1;
       }
 
-      .jb-orbit {
-        position: absolute;
-        inset: auto auto 90px 40px;
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 999px;
+      .jb-hero-meta {
+        color: rgba(255, 255, 255, 0.65);
       }
 
-      .jb-orbit-a {
-        width: 420px;
-        height: 420px;
+      .jb-preview-mode .jb-preloader-backdrop,
+      .jb-preview-mode .jb-preloader {
+        display: none;
       }
 
-      .jb-orbit-b {
-        left: 90px;
-        bottom: 140px;
-        width: 320px;
-        height: 320px;
+      .jb-preview-mode .jb-hero {
+        transform: none;
       }
 
-      .jb-orbit-c {
-        left: 142px;
-        bottom: 192px;
-        width: 220px;
-        height: 220px;
+      .jb-preview-mode .jb-hero-revealer {
+        clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
       }
 
-      .jb-visual-card {
-        position: absolute;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 28px;
-        background: linear-gradient(180deg, rgba(27, 30, 40, 0.94), rgba(13, 15, 22, 0.82));
-        backdrop-filter: blur(16px);
-        box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
+      .jb-preview-mode .jb-hero-word {
+        transform: translateY(0%);
       }
 
-      .jb-visual-card-main {
-        top: 0;
-        right: 20px;
-        width: min(100%, 350px);
-        padding: 28px;
-      }
-
-      .jb-visual-card-side {
-        top: 178px;
-        left: 0;
-        width: min(76%, 280px);
-        padding: 24px;
-        background: linear-gradient(180deg, rgba(255, 133, 95, 0.16), rgba(13, 15, 22, 0.88));
-      }
-
-      .jb-visual-card span,
-      .jb-panel span {
-        display: block;
-        margin-top: 14px;
-        line-height: 1.7;
-      }
-
-      .jb-panel-stack {
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        width: min(100%, 380px);
-        display: grid;
-        gap: 14px;
-      }
-
-      .jb-panel {
-        padding: 18px 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.04);
-        backdrop-filter: blur(12px);
-      }
-
-      .jb-footer {
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-      }
-
-      .jb-footer-copy {
-        max-width: 32rem;
-        line-height: 1.7;
-      }
-
-      @media (max-width: 1280px) {
-        .jb-title {
-          font-size: clamp(2.7rem, 5vw, 4.4rem);
-        }
-
-        .jb-metrics {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+      @media (max-width: 1000px) {
+        .jb-backdrop-row .jb-backdrop-col:nth-child(1),
+        .jb-backdrop-row .jb-backdrop-col:nth-child(2),
+        .jb-backdrop-row .jb-backdrop-col:nth-child(5) {
+          display: none;
         }
       }
 
-      @media (max-width: 1080px) {
+      @media (max-width: 720px) {
+        .jb-backdrop-row,
+        .jb-preloader-row,
         .jb-hero {
-          grid-template-columns: 1fr;
+          padding: 1rem;
         }
 
-        .jb-copy-column,
-        .jb-visual-column {
-          min-height: auto;
+        .jb-preloader-col {
+          gap: 2rem;
         }
 
-        .jb-visual-column {
-          padding-top: 24px;
-          min-height: 720px;
-        }
-      }
-
-      @media (max-width: 760px) {
-        body {
-          padding: 12px;
-        }
-
-        .jb-shell {
-          border-radius: 24px;
-        }
-
-        .jb-nav,
-        .jb-footer,
-        .jb-hero {
-          padding-left: 18px;
-          padding-right: 18px;
-        }
-
-        .jb-nav,
-        .jb-footer {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .jb-nav-links,
-        .jb-metrics {
+        h1 {
           width: 100%;
-        }
-
-        .jb-nav-links {
-          justify-content: flex-start;
-        }
-
-        .jb-title {
-          font-size: clamp(3.2rem, 18vw, 5rem);
-        }
-
-        .jb-metrics {
-          grid-template-columns: 1fr;
-        }
-
-        .jb-visual-column {
-          min-height: 760px;
-        }
-
-        .jb-visual-card-main,
-        .jb-visual-card-side,
-        .jb-panel-stack {
-          position: relative;
-          top: auto;
-          right: auto;
-          left: auto;
-          bottom: auto;
-          width: 100%;
-        }
-
-        .jb-visual-card-side,
-        .jb-panel-stack {
-          margin-top: 14px;
-        }
-
-        .jb-orbit-a {
-          width: 260px;
-          height: 260px;
-          left: 12px;
-          bottom: 140px;
-        }
-
-        .jb-orbit-b {
-          width: 210px;
-          height: 210px;
-          left: 38px;
-          bottom: 164px;
-        }
-
-        .jb-orbit-c {
-          width: 160px;
-          height: 160px;
-          left: 64px;
-          bottom: 190px;
+          font-size: clamp(4rem, 20vw, 8rem);
         }
       }
 code:
   jsx: |
     function JunkBrandingLanding() {
-      const shellRef = React.useRef(null)
-      const titleChars = 'JUNKBRANDING'.split('')
-      const navItems = ['テキスト', 'テキスト', 'テキスト']
-      const metrics = ['テキストテキスト、、、', 'テキストテキスト、、、', 'テキストテキスト、、、']
-      const panels = [
-        'テキストテキスト、、、',
-        'テキストテキスト、、、',
-        'テキストテキスト、、、',
+      const rootRef = React.useRef(null)
+      const isPreview = typeof window !== 'undefined' && window.self !== window.top
+      const backdropRows = [
+        [
+          ['JUNKBRANDING', 'JUNKBRANDING', 'JUNKBRANDING', 'JUNKBRANDING'],
+          ['テキストテキスト、、、', 'テキストテキスト、、、'],
+          ['テキストテキスト、、、', 'テキストテキスト、、、'],
+          ['JUNKBRANDING'],
+          [':::..:::.::::..:::'],
+        ],
+        [
+          ['テキストテキスト、、、'],
+          ['// / / ///// / / / ///'],
+          ['JUNKBRANDING / 17%'],
+          ['テキストテキスト、、、', 'テキストテキスト、、、'],
+          ['テキストテキスト、、、', 'テキストテキスト、、、'],
+          ['JB-01'],
+        ],
       ]
 
       React.useEffect(() => {
+        if (isPreview) {
+          return
+        }
+
         const ctx = gsap.context(() => {
-          gsap.set(
-            [
-              '.jb-badge',
-              '.jb-nav-link',
-              '.jb-char',
-              '.jb-copy',
-              '.jb-action',
-              '.jb-metric',
-              '.jb-panel',
-              '.jb-footer-copy',
-            ],
-            {
-              opacity: 0,
-              y: 30,
-            }
-          )
-
-          gsap.set('.jb-visual-card', {
-            opacity: 0,
-            y: 54,
-            rotate: -5,
-            scale: 0.94,
+          gsap.set('.jb-copy-line, .jb-status-line, .jb-hero-word', {
+            yPercent: 100,
           })
 
-          gsap.set('.jb-orbit', {
-            scale: 0.8,
-            opacity: 0,
+          gsap.set('.jb-circle-track, .jb-circle-progress', {
+            strokeDasharray: 974,
+            strokeDashoffset: 974,
           })
 
-          gsap.timeline({ defaults: { ease: 'power3.out' } })
-            .to('.jb-badge', {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
+          const timeline = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.6 })
+
+          timeline
+            .to('.jb-copy-line', {
+              yPercent: 0,
+              duration: 0.72,
+              stagger: 0.035,
             })
             .to(
-              '.jb-nav-link',
+              '.jb-circle-track',
               {
-                opacity: 1,
-                y: 0,
-                duration: 0.55,
-                stagger: 0.08,
+                strokeDashoffset: 0,
+                duration: 1.75,
+                ease: 'power2.inOut',
               },
-              0.08
+              '<'
             )
             .to(
-              '.jb-char',
+              '.jb-circle-progress',
               {
-                opacity: 1,
-                y: 0,
-                duration: 0.48,
-                stagger: 0.03,
+                strokeDashoffset: 140,
+                duration: 1.75,
+                ease: 'power2.inOut',
               },
-              0.14
+              '<0.08'
             )
             .to(
-              '.jb-copy',
+              '.jb-status-line',
               {
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
-                stagger: 0.08,
-              },
-              0.34
-            )
-            .to(
-              '.jb-action',
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.55,
-                stagger: 0.08,
-              },
-              0.44
-            )
-            .to(
-              '.jb-orbit',
-              {
-                opacity: 1,
-                scale: 1,
-                duration: 0.7,
+                yPercent: 0,
+                duration: 0.72,
                 stagger: 0.06,
               },
-              0.28
+              '-=0.72'
+            )
+            .to('.jb-preloader-shell', {
+              scale: 0.92,
+              duration: 1.2,
+              ease: 'power2.inOut',
+            })
+            .to('.jb-preloader', {
+              clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
+              duration: 1.25,
+              ease: 'power4.inOut',
+            })
+            .to(
+              '.jb-hero-revealer',
+              {
+                clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
+                duration: 1.25,
+                ease: 'power4.inOut',
+              },
+              '<'
             )
             .to(
-              '.jb-visual-card',
+              '.jb-hero',
               {
-                opacity: 1,
-                y: 0,
-                rotate: 0,
                 scale: 1,
-                duration: 0.8,
-                stagger: 0.12,
+                duration: 1.2,
+                ease: 'power4.out',
               },
-              0.24
+              '<0.06'
             )
             .to(
-              '.jb-metric',
+              '.jb-hero-word',
               {
-                opacity: 1,
-                y: 0,
-                duration: 0.56,
-                stagger: 0.08,
+                yPercent: 0,
+                duration: 0.95,
+                ease: 'power3.out',
               },
-              0.56
+              '<0.12'
             )
-            .to(
-              '.jb-panel',
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.62,
-                stagger: 0.08,
-              },
-              0.64
-            )
-            .to(
-              '.jb-footer-copy',
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.55,
-              },
-              0.82
-            )
-        }, shellRef)
+        }, rootRef)
 
         return () => ctx.revert()
-      }, [])
+      }, [isPreview])
 
       return (
-        <section ref={shellRef} className="jb-shell">
-          <div className="jb-grid" aria-hidden="true" />
-          <div className="jb-glow jb-glow-a" aria-hidden="true" />
-          <div className="jb-glow jb-glow-b" aria-hidden="true" />
-
-          <header className="jb-nav">
-            <a className="jb-brand" href="#">JUNKBRANDING</a>
-            <nav className="jb-nav-links" aria-label="primary">
-              {navItems.map((item, index) => (
-                <a key={`${item}-${index}`} className="jb-nav-link" href="#">
-                  {item}
-                </a>
-              ))}
-            </nav>
-          </header>
-
-          <div className="jb-hero">
-            <div className="jb-copy-column">
-              <p className="jb-badge">テキストテキスト、、、</p>
-
-              <h1 className="jb-title" aria-label="JUNKBRANDING">
-                {titleChars.map((char, index) => (
-                  <span key={`${char}-${index}`} className="jb-char">
-                    {char}
-                  </span>
+        <section ref={rootRef} className={`jb-landing${isPreview ? ' jb-preview-mode' : ''}`}>
+          <div className="jb-preloader-backdrop" aria-hidden="true">
+            {backdropRows.map((columns, rowIndex) => (
+              <div key={`row-${rowIndex}`} className="jb-backdrop-row">
+                {columns.map((lines, columnIndex) => (
+                  <div key={`col-${rowIndex}-${columnIndex}`} className="jb-backdrop-col">
+                    {columnIndex === 3 && rowIndex === 0 ? (
+                      <div className="jb-logo-mark" />
+                    ) : (
+                      lines.map((line, lineIndex) => <p key={`line-${lineIndex}`}>{line}</p>)
+                    )}
+                  </div>
                 ))}
-              </h1>
-
-              <p className="jb-copy">テキストテキスト、、、 テキストテキスト、、、 テキストテキスト、、、</p>
-              <p className="jb-copy">テキストテキスト、、、 テキストテキスト、、、</p>
-
-              <div className="jb-actions">
-                <a className="jb-action jb-primary" href="#">テキスト</a>
-                <a className="jb-action jb-secondary" href="#">テキスト</a>
               </div>
+            ))}
+          </div>
 
-              <ul className="jb-metrics">
-                {metrics.map((metric, index) => (
-                  <li key={`${metric}-${index}`} className="jb-metric">
-                    <span>JUNKBRANDING</span>
-                    <strong>JUNKBRANDING</strong>
-                    <p>{metric}</p>
-                  </li>
-                ))}
-              </ul>
+          <div className="jb-preloader">
+            <div className="jb-preloader-row">
+              <p><span className="jb-copy-line">JUNKBRANDING</span></p>
             </div>
 
-            <div className="jb-visual-column">
-              <div className="jb-orbit jb-orbit-a" aria-hidden="true" />
-              <div className="jb-orbit jb-orbit-b" aria-hidden="true" />
-              <div className="jb-orbit jb-orbit-c" aria-hidden="true" />
+            <div className="jb-preloader-row">
+              <div className="jb-preloader-col">
+                <div className="jb-preloader-sub-col">
+                  <p><span className="jb-copy-line">テキスト</span></p>
+                  <p><span className="jb-copy-line">テキスト</span></p>
+                </div>
 
-              <article className="jb-visual-card jb-visual-card-main">
-                <p>JUNKBRANDING</p>
-                <h2>JUNKBRANDING</h2>
-                <span>テキストテキスト、、、</span>
-              </article>
-
-              <article className="jb-visual-card jb-visual-card-side">
-                <p>JUNKBRANDING</p>
-                <h2>JUNKBRANDING</h2>
-                <span>テキストテキスト、、、</span>
-              </article>
-
-              <div className="jb-panel-stack">
-                {panels.map((panel, index) => (
-                  <article key={`${panel}-${index}`} className="jb-panel">
-                    <p>JUNKBRANDING</p>
-                    <h3>JUNKBRANDING</h3>
-                    <span>{panel}</span>
-                  </article>
-                ))}
+                <div className="jb-preloader-sub-col">
+                  <p><span className="jb-copy-line">テキスト</span></p>
+                  <p><span className="jb-copy-line">テキスト</span></p>
+                </div>
               </div>
+
+              <div className="jb-preloader-col">
+                <p><span className="jb-copy-line">JB-01</span></p>
+              </div>
+            </div>
+
+            <div className="jb-preloader-shell" aria-hidden="true">
+              <div className="jb-logo-core" />
+              <div className="jb-status-copy">
+                <span className="jb-status-line">JUNKBRANDING</span>
+              </div>
+              <div className="jb-status-copy jb-status-copy-outro">
+                <span className="jb-status-line">テキストテキスト、、、</span>
+              </div>
+
+              <svg viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle className="jb-circle-track" cx="160" cy="160" r="155" stroke="#2b2b2b" strokeWidth="2" />
+                <circle className="jb-circle-progress" cx="160" cy="160" r="155" stroke="#fff" strokeWidth="2" />
+              </svg>
             </div>
           </div>
 
-          <footer className="jb-footer">
-            <p className="jb-footer-copy">テキストテキスト、、、 テキストテキスト、、、 テキストテキスト、、、</p>
-            <a className="jb-footer-link" href="#">JUNKBRANDING</a>
-          </footer>
+          <section className="jb-hero">
+            <div className="jb-hero-revealer" aria-hidden="true" />
+            <h1>
+              <span className="jb-word-wrap">
+                <span className="jb-hero-word">JUNKBRANDING</span>
+              </span>
+            </h1>
+            <p className="jb-hero-meta">テキストテキスト、、、</p>
+          </section>
         </section>
       )
     }
   css: |
-    @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Geist+Mono:wght@400;500;700&display=swap");
 
     :root {
-      color-scheme: dark;
-      --bg: #0a0b10;
-      --panel: rgba(15, 17, 24, 0.76);
-      --panel-strong: rgba(23, 26, 36, 0.92);
-      --line: rgba(255, 255, 255, 0.12);
-      --text: #f8f4ed;
-      --muted: rgba(248, 244, 237, 0.68);
-      --accent: #ff855f;
-      --accent-soft: rgba(255, 133, 95, 0.2);
+      --base-100: #ffffff;
+      --base-200: #7a7a7a;
+      --base-300: #000000;
     }
 
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
       min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-      font-family: "Manrope", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 18% 18%, rgba(255, 133, 95, 0.2), transparent 28%),
-        radial-gradient(circle at 82% 22%, rgba(255, 214, 10, 0.12), transparent 24%),
-        linear-gradient(160deg, #08090d 0%, #11131a 52%, #0b0c11 100%);
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .jb-shell {
-      position: relative;
-      width: min(1220px, 100%);
-      margin: 0 auto;
+      background: var(--base-300);
+      color: var(--base-100);
       overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 34px;
-      background: linear-gradient(180deg, rgba(10, 11, 16, 0.94), rgba(10, 11, 16, 0.72));
-      box-shadow: 0 30px 120px rgba(0, 0, 0, 0.4);
     }
 
-    .jb-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-      background-size: 30px 30px;
-      opacity: 0.22;
-      mask-image: radial-gradient(circle at center, black, transparent 84%);
+    p {
+      text-transform: uppercase;
+      font-family: "Geist Mono", monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1;
     }
 
-    .jb-glow {
-      position: absolute;
-      border-radius: 999px;
-      filter: blur(18px);
-      pointer-events: none;
+    h1 {
+      width: 90%;
+      text-transform: uppercase;
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: clamp(5rem, 15vw, 15rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 0.8;
     }
 
-    .jb-glow-a {
-      top: -80px;
-      right: -40px;
-      width: 260px;
-      height: 260px;
-      background: rgba(255, 133, 95, 0.18);
+    .jb-word-wrap,
+    .jb-status-copy,
+    .jb-preloader p {
+      display: block;
+      overflow: hidden;
     }
 
-    .jb-glow-b {
-      bottom: -100px;
-      left: -40px;
-      width: 300px;
-      height: 300px;
-      background: rgba(255, 214, 10, 0.1);
+    .jb-copy-line,
+    .jb-status-line,
+    .jb-hero-word {
+      display: inline-block;
+      will-change: transform;
     }
 
-    .jb-nav,
-    .jb-footer {
+    .jb-landing {
       position: relative;
-      z-index: 1;
+      min-height: 100vh;
+      background: var(--base-300);
+    }
+
+    .jb-preloader-backdrop {
+      position: fixed;
+      inset: 0;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: space-between;
-      gap: 24px;
-      padding: 26px 30px;
+      background: var(--base-100);
+      color: var(--base-200);
+      z-index: 0;
     }
 
-    .jb-nav {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .jb-brand,
-    .jb-title,
-    .jb-visual-card h2,
-    .jb-panel h3,
-    .jb-metric strong,
-    .jb-footer-link {
-      font-family: "Syne", sans-serif;
-    }
-
-    .jb-brand,
-    .jb-footer-link {
-      font-size: 0.95rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-    }
-
-    .jb-nav-links {
+    .jb-backdrop-row,
+    .jb-preloader-row {
+      width: 100%;
+      padding: 1.5rem;
       display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 20px;
+      justify-content: space-between;
+      gap: 1rem;
     }
 
-    .jb-nav-link,
-    .jb-footer-copy,
-    .jb-copy,
-    .jb-metric p,
-    .jb-panel span,
-    .jb-visual-card span,
-    .jb-visual-card p {
-      color: var(--muted);
+    .jb-backdrop-row:last-child {
+      align-items: flex-end;
     }
 
-    .jb-nav-link,
-    .jb-badge,
-    .jb-metric span,
-    .jb-panel p,
-    .jb-visual-card p {
-      font-size: 0.76rem;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
+    .jb-backdrop-col,
+    .jb-preloader-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .jb-preloader-col {
+      flex-direction: row;
+      align-items: flex-end;
+      gap: 6rem;
+    }
+
+    .jb-preloader-sub-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .jb-logo-mark,
+    .jb-logo-core {
+      position: relative;
+      width: 2.5rem;
+      height: 2.5rem;
+      border: 1px dashed currentColor;
+    }
+
+    .jb-logo-mark::before,
+    .jb-logo-mark::after,
+    .jb-logo-core::before,
+    .jb-logo-core::after {
+      content: "";
+      position: absolute;
+      inset: 0.32rem;
+      border: 2px solid currentColor;
+    }
+
+    .jb-logo-mark::after,
+    .jb-logo-core::after {
+      inset: 0.68rem;
+      background: currentColor;
+    }
+
+    .jb-preloader {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--base-300);
+      color: var(--base-100);
+      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+      z-index: 2;
+    }
+
+    .jb-preloader-shell {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20rem;
+      height: 20rem;
+      transform: translate(-50%, -50%);
+    }
+
+    .jb-logo-core,
+    .jb-status-copy,
+    .jb-preloader-shell svg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .jb-logo-core {
+      width: 4rem;
+      height: 4rem;
+    }
+
+    .jb-status-copy {
+      font-family: "Geist Mono", monospace;
+      font-size: 0.9rem;
+    }
+
+    .jb-status-copy-outro {
+      top: calc(50% + 1.5rem);
+      opacity: 0.65;
+    }
+
+    .jb-preloader-shell svg {
+      width: 100%;
+      height: 100%;
     }
 
     .jb-hero {
       position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
-      align-items: start;
-      gap: 24px;
-      padding: 34px 30px 20px;
-    }
-
-    .jb-copy-column {
+      width: 100%;
+      height: 100svh;
+      padding: 1.5rem;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      min-height: clamp(520px, 70vh, 640px);
-    }
-
-    .jb-badge {
-      display: inline-flex;
-      align-self: flex-start;
-      padding: 0.62rem 0.9rem;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.04);
-      color: rgba(248, 244, 237, 0.84);
-    }
-
-    .jb-title {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.06em;
-      max-width: 10.5ch;
-      margin: 18px 0 0;
-      font-size: clamp(3.2rem, 7vw, 6.8rem);
-      line-height: 0.9;
-      letter-spacing: -0.08em;
-    }
-
-    .jb-char {
-      display: inline-block;
-      background: linear-gradient(180deg, #fff8ef 0%, #ffcf8c 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .jb-copy {
-      max-width: 30rem;
-      margin: 18px 0 0;
-      line-height: 1.8;
-      font-size: 1rem;
-    }
-
-    .jb-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 28px;
-    }
-
-    .jb-action {
-      display: inline-flex;
-      align-items: center;
       justify-content: center;
-      min-width: 170px;
-      min-height: 54px;
-      border-radius: 999px;
-      padding: 0 1.2rem;
-      font-weight: 700;
+      align-items: center;
+      gap: 1.25rem;
+      text-align: center;
+      background: var(--base-300);
+      color: var(--base-100);
+      transform: scale(0.75);
+      will-change: transform;
     }
 
-    .jb-primary {
-      color: #18120f;
-      background: linear-gradient(135deg, #ffe6ca 0%, #ff855f 100%);
+    .jb-hero-revealer {
+      position: absolute;
+      inset: 0;
+      background: var(--base-100);
+      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
     }
 
-    .jb-secondary {
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .jb-metrics {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin: auto 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .jb-metric {
-      padding: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(12px);
-    }
-
-    .jb-metric strong,
-    .jb-panel h3,
-    .jb-visual-card h2 {
-      display: block;
-      margin-top: 12px;
-      font-size: clamp(1.2rem, 2vw, 1.8rem);
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
-
-    .jb-metric p {
-      margin: 12px 0 0;
-      line-height: 1.6;
-    }
-
-    .jb-visual-column {
+    .jb-hero h1,
+    .jb-hero-meta {
       position: relative;
-      min-height: clamp(520px, 68vh, 640px);
-      padding: 8px 0 0;
+      z-index: 1;
     }
 
-    .jb-orbit {
-      position: absolute;
-      inset: auto auto 90px 40px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 999px;
+    .jb-hero-meta {
+      color: rgba(255, 255, 255, 0.65);
     }
 
-    .jb-orbit-a {
-      width: 420px;
-      height: 420px;
+    .jb-preview-mode .jb-preloader-backdrop,
+    .jb-preview-mode .jb-preloader {
+      display: none;
     }
 
-    .jb-orbit-b {
-      left: 90px;
-      bottom: 140px;
-      width: 320px;
-      height: 320px;
+    .jb-preview-mode .jb-hero {
+      transform: none;
     }
 
-    .jb-orbit-c {
-      left: 142px;
-      bottom: 192px;
-      width: 220px;
-      height: 220px;
+    .jb-preview-mode .jb-hero-revealer {
+      clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
     }
 
-    .jb-visual-card {
-      position: absolute;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 28px;
-      background: linear-gradient(180deg, rgba(27, 30, 40, 0.94), rgba(13, 15, 22, 0.82));
-      backdrop-filter: blur(16px);
-      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
+    .jb-preview-mode .jb-hero-word {
+      transform: translateY(0%);
     }
 
-    .jb-visual-card-main {
-      top: 0;
-      right: 20px;
-      width: min(100%, 350px);
-      padding: 28px;
-    }
-
-    .jb-visual-card-side {
-      top: 178px;
-      left: 0;
-      width: min(76%, 280px);
-      padding: 24px;
-      background: linear-gradient(180deg, rgba(255, 133, 95, 0.16), rgba(13, 15, 22, 0.88));
-    }
-
-    .jb-visual-card span,
-    .jb-panel span {
-      display: block;
-      margin-top: 14px;
-      line-height: 1.7;
-    }
-
-    .jb-panel-stack {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      width: min(100%, 380px);
-      display: grid;
-      gap: 14px;
-    }
-
-    .jb-panel {
-      padding: 18px 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(12px);
-    }
-
-    .jb-footer {
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .jb-footer-copy {
-      max-width: 32rem;
-      line-height: 1.7;
-    }
-
-    @media (max-width: 1280px) {
-      .jb-title {
-        font-size: clamp(3rem, 6.4vw, 5.8rem);
-      }
-
-      .jb-metrics {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    @media (max-width: 1000px) {
+      .jb-backdrop-row .jb-backdrop-col:nth-child(1),
+      .jb-backdrop-row .jb-backdrop-col:nth-child(2),
+      .jb-backdrop-row .jb-backdrop-col:nth-child(5) {
+        display: none;
       }
     }
 
-    @media (max-width: 1080px) {
+    @media (max-width: 720px) {
+      .jb-backdrop-row,
+      .jb-preloader-row,
       .jb-hero {
-        grid-template-columns: 1fr;
+        padding: 1rem;
       }
 
-      .jb-copy-column,
-      .jb-visual-column {
-        min-height: auto;
+      .jb-preloader-col {
+        gap: 2rem;
       }
 
-      .jb-visual-column {
-        padding-top: 24px;
-        min-height: 720px;
+      h1 {
+        width: 100%;
+        font-size: clamp(4rem, 20vw, 8rem);
       }
     }
-
-    @media (max-width: 760px) {
-      body {
-        padding: 12px;
-      }
-
-      .jb-shell {
-        border-radius: 24px;
-      }
-
-      .jb-nav,
-      .jb-footer,
-      .jb-hero {
-        padding-left: 18px;
-        padding-right: 18px;
-      }
-
-      .jb-nav,
-      .jb-footer {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .jb-nav-links,
-      .jb-metrics {
-        width: 100%;
-      }
-
-      .jb-nav-links {
-        justify-content: flex-start;
-      }
-
-      .jb-title {
-        font-size: clamp(3.2rem, 18vw, 5rem);
-      }
-
-      .jb-metrics {
-        grid-template-columns: 1fr;
-      }
-
-      .jb-visual-column {
-        min-height: 760px;
-      }
-
-      .jb-visual-card-main,
-      .jb-visual-card-side,
-      .jb-panel-stack {
-        position: relative;
-        top: auto;
-        right: auto;
-        left: auto;
-        bottom: auto;
-        width: 100%;
-      }
-
-      .jb-visual-card-side,
-      .jb-panel-stack {
-        margin-top: 14px;
-      }
-
-      .jb-orbit-a {
-        width: 260px;
-        height: 260px;
-        left: 12px;
-        bottom: 140px;
-      }
-
       .jb-orbit-b {
         width: 210px;
         height: 210px;
