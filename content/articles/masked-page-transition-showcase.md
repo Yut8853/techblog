@@ -1,5 +1,5 @@
 ---
-title: マスク遷移とスライド遷移を組み合わせたページ切り替え演出
+title: Masked Page Transition Showcase
 description: オーバーレイのマスク拡張とコンテンツのスライドインを組み合わせた、ページ遷移風の演出です。
 category: ページ遷移・画面切り替え系
 tags:
@@ -14,7 +14,7 @@ viewer: playground
 thumbnail: runtime
 layout: gallery
 files:
-  - name: PageTransition.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function PageTransition() {
@@ -70,7 +70,7 @@ files:
           </section>
         )
       }
-  - name: transition.css
+  - name: styles.css
     language: css
     content: |
       body {

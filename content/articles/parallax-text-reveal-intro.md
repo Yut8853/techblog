@@ -1,5 +1,5 @@
 ---
-title: パララックスとテキストリビールを組み合わせた導入アニメーション
+title: Parallax Text Reveal Intro
 description: 奥行きのある背景パララックスに、見出しのテキストリビールを重ねた導入表現です。
 category: パララックス系
 tags:
@@ -15,7 +15,7 @@ viewer: playground
 thumbnail: runtime
 layout: tutorial
 files:
-  - name: IntroScene.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function IntroScene() {
@@ -87,7 +87,7 @@ files:
           </div>
         )
       }
-  - name: intro.css
+  - name: styles.css
     language: css
     content: |
       body {

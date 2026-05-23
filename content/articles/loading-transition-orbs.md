@@ -1,5 +1,5 @@
 ---
-title: ローディングと画面切り替えを組み合わせたオーブ演出
+title: Loading Transition Orbs
 description: ローディングの集約表現から、メイン画面への遷移までを一続きで見せるオーブアニメーションです。
 category: ローディング系
 tags:
@@ -15,7 +15,7 @@ viewer: playground
 thumbnail: runtime
 layout: gallery
 files:
-  - name: OrbLoader.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function OrbLoader() {
@@ -86,7 +86,7 @@ files:
           </section>
         )
       }
-  - name: orbs.css
+  - name: styles.css
     language: css
     content: |
       body {

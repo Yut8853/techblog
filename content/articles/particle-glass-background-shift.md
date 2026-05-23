@@ -1,5 +1,5 @@
 ---
-title: パーティクルとグラスモーフィズムを組み合わせた背景演出
+title: Particle Glass Background Shift
 description: 背景のパーティクルアニメーションとガラス風パネルを重ねて、情報面を際立たせるビジュアル表現です。
 category: 背景・ビジュアル表現系
 tags:
@@ -13,7 +13,7 @@ viewer: playground
 thumbnail: runtime
 layout: gallery
 files:
-  - name: ParticleGlass.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function ParticleGlass() {
@@ -46,7 +46,7 @@ files:
           </section>
         )
       }
-  - name: particle.css
+  - name: styles.css
     language: css
     content: |
       body {

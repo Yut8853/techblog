@@ -1,5 +1,5 @@
 ---
-title: GSAPで組む5枚構成のランディングページリビール
+title: Steelworks Landing Page Reveal
 description: プリローダー、カード整列、中央ビジュアル拡張の流れを記事化しました。
 category: ページ遷移・画面切り替え系
 tags:
@@ -16,7 +16,7 @@ viewer: playground
 thumbnail: runtime
 layout: gallery
 files:
-  - name: SteelworksLandingReveal.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function SteelworksLandingReveal() {

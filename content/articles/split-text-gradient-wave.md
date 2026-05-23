@@ -1,5 +1,5 @@
 ---
-title: 文字分割とグラデーションを組み合わせたウェーブ見出し
+title: Split Text Gradient Wave
 description: 文字分割アニメーションとグラデーションテキストを重ねて、見出しだけで空気感を作る表現です。
 category: テキスト演出系
 tags:
@@ -13,7 +13,7 @@ viewer: playground
 thumbnail: runtime
 layout: tutorial
 files:
-  - name: SplitWave.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function SplitWave() {
@@ -77,7 +77,7 @@ files:
           </section>
         )
       }
-  - name: split-wave.css
+  - name: styles.css
     language: css
     content: |
       body {

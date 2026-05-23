@@ -1,5 +1,5 @@
 ---
-title: リップルと矢印リフトを組み合わせたCTAボタン演出
+title: Button Ripple Arrow Lift
 description: ホバー時のリップル拡張と矢印の持ち上がりを組み合わせて、押したくなる CTA を作る実験です。
 category: ボタン・CTA系
 tags:
@@ -14,7 +14,7 @@ viewer: playground
 thumbnail: runtime
 layout: default
 files:
-  - name: CTAButton.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function CTAButton() {
@@ -74,7 +74,7 @@ files:
           </section>
         )
       }
-  - name: cta.css
+  - name: styles.css
     language: css
     content: |
       body {

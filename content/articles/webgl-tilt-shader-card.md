@@ -1,5 +1,5 @@
 ---
-title: 3Dモーションとシェーダー風発光を組み合わせたビジュアルカード
+title: WebGL Tilt Shader Card
 description: 3D チルトの動きにシェーダー風の発光レイヤーを重ねて、WebGL ライクなカード表現を作る実験です。
 category: 3D・WebGL寄り
 tags:
@@ -15,7 +15,7 @@ viewer: playground
 thumbnail: runtime
 layout: gallery
 files:
-  - name: ShaderCard.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function ShaderCard() {
@@ -62,7 +62,7 @@ files:
           </section>
         )
       }
-  - name: shader-card.css
+  - name: styles.css
     language: css
     content: |
       body {

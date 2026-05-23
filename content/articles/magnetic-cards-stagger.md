@@ -1,5 +1,5 @@
 ---
-title: マグネットホバーとスタッガー登場を組み合わせたカードUI
+title: Magnetic Cards Stagger
 description: カードの登場アニメーションに、ホバー時のマグネット挙動を組み合わせた UI 表現です。
 category: カード・UIパーツ系
 tags:
@@ -14,7 +14,7 @@ viewer: playground
 thumbnail: runtime
 layout: default
 files:
-  - name: MagneticCards.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function MagneticCards() {
@@ -103,7 +103,7 @@ files:
           </section>
         )
       }
-  - name: cards.css
+  - name: styles.css
     language: css
     content: |
       body {

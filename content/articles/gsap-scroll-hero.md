@@ -1,5 +1,5 @@
 ---
-title: GSAPで作るスクロール連動ヒーローアニメーション
+title: Scroll Hero
 description: GSAPとScrollTriggerを使って、スクロールに合わせてダイナミックに動き出すヒーロー表現を実装します。
 category: スクロール連動
 tags:
@@ -15,7 +15,7 @@ viewer: playground
 thumbnail: runtime
 layout: tutorial
 files:
-  - name: Hero.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function Hero() {
@@ -86,7 +86,7 @@ files:
           </div>
         )
       }
-  - name: hero.css
+  - name: styles.css
     language: css
     content: |
       :root {

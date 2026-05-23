@@ -2,6 +2,13 @@
 
 import { useEffect, useRef } from 'react';
 import type { ArticleCode, ArticleFile } from '@/lib/articles/types';
+import {
+  buildCodeFiles,
+  bundleReactFiles,
+  collectStyleCode,
+  extractComponentName,
+  getFileExtension,
+} from '@/lib/playground-preview';
 
 type PreviewMode = 'thumbnail' | 'player';
 
@@ -13,34 +20,6 @@ interface CodeThumbnailProps {
   className?: string;
   title?: string;
   reloadToken?: number;
-}
-
-// JSXコードから最初の関数コンポーネント名を抽出
-function extractComponentName(jsxCode: string): string {
-  const match = jsxCode.match(/function\s+(\w+)\s*\(/);
-  return match ? match[1] : 'App';
-}
-
-function getFileExtension(fileName: string): string {
-  return fileName.split('.').pop()?.toLowerCase() || '';
-}
-
-function buildCodeFiles(
-  code?: ArticleCode,
-  files?: ArticleFile[]
-): Record<string, string> {
-  if (files && files.length > 0) {
-    return Object.fromEntries(files.map(file => [file.name, file.content]));
-  }
-
-  if (code) {
-    return {
-      'Component.jsx': code.jsx,
-      'styles.css': code.css,
-    };
-  }
-
-  return {};
 }
 
 function getPreviewShellStyles(mode: PreviewMode): string {
@@ -129,12 +108,16 @@ function getPlaybackScript(mode: PreviewMode): string {
 }
 
 function generateReactPreviewHTML(
-  jsxCode: string,
+  codeFiles: Record<string, string>,
   cssCode: string,
   baseOrigin: string,
   mode: PreviewMode
 ): string {
-  const componentName = extractComponentName(jsxCode);
+  const bundle = bundleReactFiles(codeFiles);
+  const bundledCode = bundle?.bundledCode || 'function Component() { return null }';
+  const componentName = extractComponentName(
+    bundle?.entryCode || 'function Component() { return null }'
+  );
 
   const loopWrapper = mode === 'thumbnail'
     ? `
@@ -178,8 +161,8 @@ function generateReactPreviewHTML(
 </head>
 <body>
   <div id="root"></div>
-  <script type="text/babel">
-    ${jsxCode}
+  <script type="text/babel" data-presets="react,typescript">
+    ${bundledCode}
     
     ${loopWrapper}
     
@@ -235,10 +218,7 @@ function generatePreviewHTML(
   const htmlEntry = entries.find(([fileName]) =>
     ['html', 'htm'].includes(getFileExtension(fileName))
   );
-  const cssCode = entries
-    .filter(([fileName]) => getFileExtension(fileName) === 'css')
-    .map(([, content]) => content)
-    .join('\n\n');
+  const cssCode = collectStyleCode(codeFiles);
 
   if (htmlEntry) {
     const jsCode = entries
@@ -255,15 +235,15 @@ function generatePreviewHTML(
     );
   }
 
-  const jsxEntry = entries.find(([fileName]) =>
-    ['jsx', 'tsx'].includes(getFileExtension(fileName))
+  const reactEntry = entries.find(([fileName]) =>
+    ['jsx', 'tsx', 'js', 'ts'].includes(getFileExtension(fileName))
   );
 
-  if (!jsxEntry) {
+  if (!reactEntry) {
     return null;
   }
 
-  return generateReactPreviewHTML(jsxEntry[1], cssCode, baseOrigin, mode);
+  return generateReactPreviewHTML(codeFiles, cssCode, baseOrigin, mode);
 }
 
 export function CodeThumbnail({

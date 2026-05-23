@@ -1,5 +1,5 @@
 ---
-title: GSAPで作るスタックカードのスクロールショーケース
+title: Stacked Cards Showcase
 description: ScrollTriggerでカードを重ねながら切り替えていく、縦スクロール型のショーケース演出です。
 category: スクロール連動
 tags:
@@ -16,7 +16,7 @@ viewer: playground
 thumbnail: runtime
 layout: tutorial
 files:
-  - name: StackedCardsShowcase.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function StackedCardsShowcase() {

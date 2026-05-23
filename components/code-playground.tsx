@@ -3,13 +3,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronRight, ChevronDown, File, Folder } from 'lucide-react';
 import type { ArticleCode, ArticleFile } from '@/lib/articles/types';
-
-interface FileNode {
-  name: string;
-  type: 'file' | 'folder';
-  path?: string;
-  children?: FileNode[];
-}
+import {
+  buildCodeFiles,
+  buildFileStructure,
+  bundleReactFiles,
+  collectStyleCode,
+  extractComponentName,
+  getFileExtension,
+  getPreferredFileName,
+  type FileNode,
+} from '@/lib/playground-preview';
 
 interface CodePlaygroundProps {
   code?: ArticleCode;
@@ -54,47 +57,6 @@ const defaultFiles: ArticleFile[] = [
   { name: 'Component.jsx', language: 'jsx', content: defaultCode.jsx },
   { name: 'styles.css', language: 'css', content: defaultCode.css },
 ];
-
-function extractComponentName(jsxCode: string): string {
-  const match = jsxCode.match(/function\s+(\w+)\s*\(/);
-  return match ? match[1] : 'App';
-}
-
-function getFileExtension(fileName: string): string {
-  return fileName.split('.').pop()?.toLowerCase() || '';
-}
-
-function buildCodeFiles(
-  code?: ArticleCode,
-  files?: ArticleFile[]
-): Record<string, string> {
-  if (files && files.length > 0) {
-    return Object.fromEntries(files.map(file => [file.name, file.content]));
-  }
-
-  if (code) {
-    return {
-      'Component.jsx': code.jsx,
-      'styles.css': code.css,
-    };
-  }
-
-  return Object.fromEntries(defaultFiles.map(file => [file.name, file.content]));
-}
-
-function buildFileStructure(fileNames: string[]): FileNode[] {
-  return [
-    {
-      name: 'project',
-      type: 'folder',
-      children: fileNames.map(fileName => ({
-        name: fileName,
-        type: 'file',
-        path: fileName,
-      })),
-    },
-  ];
-}
 
 function FileTreeItem({
   node,
@@ -150,7 +112,7 @@ function FileTreeItem({
       return <File className="h-4 w-4 text-orange-400" />;
     }
 
-    if (extension === 'js' || extension === 'mjs') {
+    if (extension === 'js' || extension === 'mjs' || extension === 'ts') {
       return <File className="h-4 w-4 text-yellow-400" />;
     }
 
@@ -184,11 +146,13 @@ function FileTreeItem({
 }
 
 function generateReactPreviewHTML(
-  jsxCode: string,
+  codeFiles: Record<string, string>,
   cssCode: string,
   baseOrigin: string
 ): string {
-  const componentName = extractComponentName(jsxCode);
+  const bundle = bundleReactFiles(codeFiles);
+  const bundledCode = bundle?.bundledCode || defaultCode.jsx;
+  const componentName = extractComponentName(bundle?.entryCode || defaultCode.jsx);
 
   return `
 <!DOCTYPE html>
@@ -213,8 +177,8 @@ function generateReactPreviewHTML(
 </head>
 <body>
   <div id="root"></div>
-  <script type="text/babel">
-    ${jsxCode}
+  <script type="text/babel" data-presets="react,typescript">
+    ${bundledCode}
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<${componentName} />);
   </script>
@@ -265,10 +229,7 @@ function generatePreviewHTML(
   const htmlEntry = entries.find(([fileName]) =>
     ['html', 'htm'].includes(getFileExtension(fileName))
   );
-  const cssCode = entries
-    .filter(([fileName]) => getFileExtension(fileName) === 'css')
-    .map(([, content]) => content)
-    .join('\n\n');
+  const cssCode = collectStyleCode(codeFiles);
 
   if (htmlEntry) {
     const jsCode = entries
@@ -279,19 +240,21 @@ function generatePreviewHTML(
     return generateHtmlPreviewHTML(htmlEntry[1], cssCode, jsCode, baseOrigin);
   }
 
-  const jsxEntry =
-    entries.find(([fileName]) =>
-      ['jsx', 'tsx'].includes(getFileExtension(fileName))
-    ) || ['Component.jsx', defaultCode.jsx];
-
-  return generateReactPreviewHTML(jsxEntry[1], cssCode, baseOrigin);
+  return generateReactPreviewHTML(codeFiles, cssCode, baseOrigin);
 }
 
 export function CodePlayground({ code, files }: CodePlaygroundProps) {
-  const initialCodeFiles = buildCodeFiles(code, files);
+  const initialCodeFiles = (() => {
+    const filesMap = buildCodeFiles(code, files);
+    if (Object.keys(filesMap).length > 0) {
+      return filesMap;
+    }
+
+    return Object.fromEntries(defaultFiles.map(file => [file.name, file.content]));
+  })();
   const [codeFiles, setCodeFiles] = useState(initialCodeFiles);
   const [selectedFile, setSelectedFile] = useState(
-    Object.keys(initialCodeFiles)[0] || 'Component.jsx'
+    getPreferredFileName(Object.keys(initialCodeFiles))
   );
   const [previewKey, setPreviewKey] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -302,9 +265,16 @@ export function CodePlayground({ code, files }: CodePlaygroundProps) {
   const fileTree = buildFileStructure(tabs);
 
   useEffect(() => {
-    const nextCodeFiles = buildCodeFiles(code, files);
+    const nextCodeFiles = (() => {
+      const filesMap = buildCodeFiles(code, files);
+      if (Object.keys(filesMap).length > 0) {
+        return filesMap;
+      }
+
+      return Object.fromEntries(defaultFiles.map(file => [file.name, file.content]));
+    })();
     setCodeFiles(nextCodeFiles);
-    setSelectedFile(Object.keys(nextCodeFiles)[0] || 'Component.jsx');
+    setSelectedFile(getPreferredFileName(Object.keys(nextCodeFiles)));
     setPreviewKey(prev => prev + 1);
   }, [code, files]);
 

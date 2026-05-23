@@ -1,5 +1,5 @@
 ---
-title: GSAPで作るSplitText見出しとCTAバナー演出
+title: SplitText CTA Banner
 description: SplitText と timeline を使って、見出しとボタンを一体で見せるヒーローバナー演出です。
 category: テキスト演出系
 tags:
@@ -16,7 +16,7 @@ viewer: playground
 thumbnail: runtime
 layout: tutorial
 files:
-  - name: SplitTextCtaBanner.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function SplitTextCtaBanner() {

@@ -1,5 +1,5 @@
 ---
-title: JUNKBRANDINGのエディトリアルランディングをReactで組み直す
+title: JUNKBRANDING Editorial Landing
 description: 静的なランディングページの構図を React のコンポーネント構成に置き換え、ブランドタイポとパネル群を一体で見せる記事です。
 category: 背景・ビジュアル表現系
 tags:
@@ -15,7 +15,7 @@ viewer: playground
 thumbnail: runtime
 layout: gallery
 files:
-  - name: JunkBrandingLanding.jsx
+  - name: Component.jsx
     language: jsx
     content: |
       function JunkBrandingLanding() {
@@ -246,7 +246,7 @@ files:
           </section>
         )
       }
-  - name: landing.css
+  - name: styles.css
     language: css
     content: |
       @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap");

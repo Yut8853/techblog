@@ -1,5 +1,5 @@
 ---
-title: カスタムカーソルとマグネットボタンを組み合わせた追従UI
+title: Cursor Magnet Trail
 description: カスタムカーソルの追従とマグネットボタンを合わせて、触りたくなる CTA 体験を作る実験です。
 category: マウス・インタラクション系
 tags:
@@ -14,15 +14,67 @@ viewer: playground
 thumbnail: runtime
 layout: default
 files:
-  - name: CursorMagnet.jsx
-    language: jsx
+  - name: Component.tsx
+    language: tsx
     content: |
-      function CursorMagnet() {
-        const cursorRef = React.useRef(null)
-        const buttonRef = React.useRef(null)
+      import { CursorMagnetScene } from './components/CursorMagnetScene'
+      import type { CursorMagnetContent } from './types'
+
+      const content: CursorMagnetContent = {
+        eyebrow: 'テキストテキスト、、、、',
+        title: 'JUNKBRANDING',
+        body: 'テキストテキスト、、、、',
+        ctaLabel: '詳しく見る',
+      }
+
+      function Component() {
+        return <CursorMagnetScene content={content} />
+      }
+  - name: components/CursorMagnetScene.tsx
+    language: tsx
+    content: |
+      import { useCursorMagnet } from '../hooks/useCursorMagnet'
+      import type { CursorMagnetContent } from '../types'
+
+      interface CursorMagnetSceneProps {
+        content: CursorMagnetContent
+      }
+
+      export function CursorMagnetScene({ content }: CursorMagnetSceneProps) {
+        const { cursorRef, buttonRef, handleMove, handleLeave } = useCursorMagnet()
+
+        return (
+          <section className="cursor-lab">
+            <div ref={cursorRef} className="cursor-orb" />
+            <div className="cursor-copy">
+              <p className="cursor-label">{content.eyebrow}</p>
+              <h1>{content.title}</h1>
+              <p>{content.body}</p>
+              <button
+                ref={buttonRef}
+                className="cursor-button"
+                onMouseMove={handleMove}
+                onMouseLeave={handleLeave}
+              >
+                {content.ctaLabel}
+              </button>
+            </div>
+          </section>
+        )
+      }
+  - name: hooks/useCursorMagnet.ts
+    language: ts
+    content: |
+      export function useCursorMagnet() {
+        const cursorRef = React.useRef<HTMLDivElement | null>(null)
+        const buttonRef = React.useRef<HTMLButtonElement | null>(null)
 
         React.useEffect(() => {
-          const moveCursor = event => {
+          const moveCursor = (event: PointerEvent) => {
+            if (!cursorRef.current) {
+              return
+            }
+
             gsap.to(cursorRef.current, {
               x: event.clientX,
               y: event.clientY,
@@ -35,7 +87,11 @@ files:
           return () => window.removeEventListener('pointermove', moveCursor)
         }, [])
 
-        const handleMove = event => {
+        const handleMove = (event: React.MouseEvent<HTMLButtonElement>) => {
+          if (!buttonRef.current) {
+            return
+          }
+
           const rect = buttonRef.current.getBoundingClientRect()
           const x = event.clientX - rect.left - rect.width / 2
           const y = event.clientY - rect.top - rect.height / 2
@@ -49,6 +105,10 @@ files:
         }
 
         const handleLeave = () => {
+          if (!buttonRef.current) {
+            return
+          }
+
           gsap.to(buttonRef.current, {
             x: 0,
             y: 0,
@@ -57,26 +117,23 @@ files:
           })
         }
 
-        return (
-          <section className="cursor-lab">
-            <div ref={cursorRef} className="cursor-orb" />
-            <div className="cursor-copy">
-              <p className="cursor-label">テキストテキスト、、、、</p>
-              <h1>JUNKBRANDING</h1>
-              <p>テキストテキスト、、、、</p>
-              <button
-                ref={buttonRef}
-                className="cursor-button"
-                onMouseMove={handleMove}
-                onMouseLeave={handleLeave}
-              >
-                詳しく見る
-              </button>
-            </div>
-          </section>
-        )
+        return {
+          cursorRef,
+          buttonRef,
+          handleMove,
+          handleLeave,
+        }
       }
-  - name: cursor.css
+  - name: types.ts
+    language: ts
+    content: |
+      export interface CursorMagnetContent {
+        eyebrow: string
+        title: string
+        body: string
+        ctaLabel: string
+      }
+  - name: styles.css
     language: css
     content: |
       body {
