@@ -87,7 +87,7 @@ files:
             <div className="magnetic-grid">
               {cards.map((card, index) => (
                 <article
-                  key={card.label}
+                  key={`${card.label}-${index}`}
                   ref={element => {
                     cardsRef.current[index] = element
                   }}
@@ -243,7 +243,7 @@ code:
           <div className="magnetic-grid">
             {cards.map((card, index) => (
               <article
-                key={card.label}
+                key={`${card.label}-${index}`}
                 ref={element => {
                   cardsRef.current[index] = element
                 }}

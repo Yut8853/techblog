@@ -139,6 +139,7 @@ function generateReactPreviewHTML(
   const rootComponent = mode === 'thumbnail'
     ? 'ThumbnailWrapper'
     : componentName;
+  const runtimeSource = `${bundledCode}\n\n${loopWrapper}\n\nconst root = ReactDOM.createRoot(document.getElementById('root'));\nroot.render(React.createElement(${rootComponent}));`;
 
   return `
 <!DOCTYPE html>
@@ -153,7 +154,7 @@ function generateReactPreviewHTML(
   <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
   <script src="https://unpkg.com/gsap@3/dist/SplitText.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/typescript@5/lib/typescript.js"></script>
   <style>
     ${getPreviewShellStyles(mode)}
     ${cssCode}
@@ -161,13 +162,23 @@ function generateReactPreviewHTML(
 </head>
 <body>
   <div id="root"></div>
-  <script type="text/babel" data-presets="react,typescript">
-    ${bundledCode}
-    
-    ${loopWrapper}
-    
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<${rootComponent} />);
+  <script>
+    const source = ${JSON.stringify(runtimeSource)};
+    const transpiled = window.ts.transpileModule(source, {
+      compilerOptions: {
+        jsx: window.ts.JsxEmit.React,
+        target: window.ts.ScriptTarget.ES2019,
+        module: window.ts.ModuleKind.None,
+      },
+      fileName: 'preview.tsx',
+      reportDiagnostics: false,
+    }).outputText;
+
+    try {
+      window.eval(transpiled);
+    } catch (error) {
+      console.error(error);
+    }
   </script>
   ${getPlaybackScript(mode)}
 </body>

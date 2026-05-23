@@ -21,6 +21,7 @@ files:
     content: |
       function SteelworksLandingReveal() {
         const rootRef = React.useRef(null)
+        const isPreview = typeof window !== 'undefined' && window.self !== window.top
         const images = [
           '/images/steelworks-free/img-1.svg',
           '/images/steelworks-free/img-2.svg',
@@ -28,9 +29,14 @@ files:
           '/images/steelworks-free/img-4.svg',
           '/images/steelworks-free/img-5.svg',
         ]
+        const activeImages = isPreview ? [images[2]] : images
         const navItems = ['About', 'Work', 'Contact']
 
         React.useEffect(() => {
+          if (isPreview) {
+            return
+          }
+
           gsap.registerPlugin(CustomEase)
 
           CustomEase.create('hop', '0.9, 0, 0.1, 1')
@@ -168,15 +174,15 @@ files:
               context.revert()
             }
           }
-        }, [])
+        }, [isPreview])
 
         return (
-          <>
+          <div ref={rootRef} className={isPreview ? 'preview-mode' : ''}>
             <div className="preloader-overlay">
               <div className="preloader" />
             </div>
 
-            <div ref={rootRef}>
+            <div>
               <nav>
                 <div className="nav-logo">
                   <a href="#">JUNK BRANDING</a>
@@ -190,10 +196,10 @@ files:
               </nav>
 
               <section className="hero">
-                {images.map((src, index) => (
+                {activeImages.map((src, index) => (
                   <div
-                    key={src}
-                    className={`intro-img${index === 2 ? ' hero-img' : ''}`}
+                    key={`${src}-${index}`}
+                    className={`intro-img${isPreview || index === 2 ? ' hero-img' : ''}`}
                   >
                     <img src={src} alt="" />
                   </div>
@@ -213,7 +219,7 @@ files:
                 </div>
               </section>
             </div>
-          </>
+          </div>
         )
       }
   - name: styles.css
@@ -335,6 +341,47 @@ files:
         transform: translateY(40px);
       }
 
+      .preview-mode .preloader-overlay {
+        display: none;
+      }
+
+      .preview-mode nav a,
+      .preview-mode .hero-header h1,
+      .preview-mode .hero-social p,
+      .preview-mode .hero-social a {
+        opacity: 1;
+        transform: none;
+      }
+
+      .preview-mode nav {
+        position: absolute;
+        inset: 0 0 auto 0;
+        padding: 1.5rem 1.75rem;
+      }
+
+      .preview-mode .nav-items {
+        gap: 2rem;
+      }
+
+      .preview-mode .hero-content {
+        padding: 7rem 1.75rem 2.5rem;
+      }
+
+      .preview-mode .hero-header {
+        width: min(78%, 980px);
+      }
+
+      .preview-mode .hero-header h1 {
+        font-size: clamp(2.3rem, 4.6vw, 4.8rem);
+        line-height: 1.02;
+      }
+
+      .preview-mode .hero-social p,
+      .preview-mode .hero-social a,
+      .preview-mode nav a {
+        font-size: clamp(1rem, 1.5vw, 1.35rem);
+      }
+
       @media (max-width: 1000px) {
         .nav-items {
           flex-direction: column;
@@ -409,6 +456,52 @@ code:
               })
 
               img.dataset.centeredX = String(centeredX)
+            })
+
+            if (window.self !== window.top) {
+              gsap.set('.preloader-overlay', {
+                opacity: 0,
+                clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)',
+              })
+
+              gsap.set('.hero-img', {
+                scale: 1,
+                x: 0,
+                rotation: 0,
+                borderRadius: 0,
+              })
+
+              introImages.forEach((img, index) => {
+                if (index === 2) {
+                  return
+                }
+
+                gsap.set(img, {
+                  x: index < 2 ? '-100vw' : '100vw',
+                })
+              })
+
+              gsap.set('nav a, .hero-header h1, .hero-social p, .hero-social a', {
+                opacity: 1,
+                y: 0,
+              })
+
+              return
+            }
+            
+            gsap.set('.preloader-overlay', {
+              opacity: 1,
+              clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+            })
+
+            gsap.set('.preloader', {
+              scaleX: 0,
+              transformOrigin: 'left',
+            })
+
+            gsap.set('nav a, .hero-header h1, .hero-social p, .hero-social a', {
+              opacity: 0,
+              y: 40,
             })
 
             const timeline = gsap.timeline({ delay: 1 })
@@ -504,12 +597,12 @@ code:
       }, [])
 
       return (
-        <>
+        <div ref={rootRef}>
           <div className="preloader-overlay">
             <div className="preloader" />
           </div>
 
-          <div ref={rootRef}>
+          <div>
             <nav>
               <div className="nav-logo">
                 <a href="#">JUNK BRANDING</a>
@@ -546,7 +639,7 @@ code:
               </div>
             </section>
           </div>
-        </>
+        </div>
       )
     }
   css: |
@@ -607,7 +700,9 @@ code:
       width: 100%;
       height: 100svh;
       background-color: #0f0f0f;
-      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%);
+        opacity: 0;
+        pointer-events: none;
       z-index: 10;
     }
 
@@ -658,13 +753,13 @@ code:
       width: 60%;
     }
 
-    nav a,
-    .hero-header h1,
-    .hero-social p,
-    .hero-social a {
-      opacity: 0;
-      transform: translateY(40px);
-    }
+      nav a,
+      .hero-header h1,
+      .hero-social p,
+      .hero-social a {
+        opacity: 0;
+        transform: translateY(40px);
+      }
 
     @media (max-width: 1000px) {
       .nav-items {

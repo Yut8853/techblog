@@ -391,8 +391,9 @@ files:
         position: relative;
         z-index: 1;
         display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-        gap: 28px;
+        grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+        align-items: start;
+        gap: 24px;
         padding: 34px 30px 20px;
       }
 
@@ -400,7 +401,7 @@ files:
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        min-height: 640px;
+        min-height: clamp(520px, 70vh, 640px);
       }
 
       .jb-badge {
@@ -415,11 +416,11 @@ files:
 
       .jb-title {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         gap: 0.06em;
-        max-width: 9ch;
+        max-width: none;
         margin: 18px 0 0;
-        font-size: clamp(4rem, 9vw, 8rem);
+        font-size: clamp(2.8rem, 5.4vw, 5rem);
         line-height: 0.9;
         letter-spacing: -0.08em;
       }
@@ -433,7 +434,7 @@ files:
       }
 
       .jb-copy {
-        max-width: 34rem;
+        max-width: 30rem;
         margin: 18px 0 0;
         line-height: 1.8;
         font-size: 1rem;
@@ -501,7 +502,7 @@ files:
 
       .jb-visual-column {
         position: relative;
-        min-height: 640px;
+        min-height: clamp(520px, 68vh, 640px);
         padding: 8px 0 0;
       }
 
@@ -543,14 +544,14 @@ files:
       .jb-visual-card-main {
         top: 0;
         right: 20px;
-        width: min(100%, 380px);
+        width: min(100%, 350px);
         padding: 28px;
       }
 
       .jb-visual-card-side {
         top: 178px;
         left: 0;
-        width: min(78%, 300px);
+        width: min(76%, 280px);
         padding: 24px;
         background: linear-gradient(180deg, rgba(255, 133, 95, 0.16), rgba(13, 15, 22, 0.88));
       }
@@ -566,7 +567,7 @@ files:
         position: absolute;
         right: 0;
         bottom: 0;
-        width: min(100%, 420px);
+        width: min(100%, 380px);
         display: grid;
         gap: 14px;
       }
@@ -586,6 +587,16 @@ files:
       .jb-footer-copy {
         max-width: 32rem;
         line-height: 1.7;
+      }
+
+      @media (max-width: 1280px) {
+        .jb-title {
+          font-size: clamp(2.7rem, 5vw, 4.4rem);
+        }
+
+        .jb-metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
       }
 
       @media (max-width: 1080px) {
@@ -1057,8 +1068,9 @@ code:
       position: relative;
       z-index: 1;
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-      gap: 28px;
+      grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+      align-items: start;
+      gap: 24px;
       padding: 34px 30px 20px;
     }
 
@@ -1066,7 +1078,7 @@ code:
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 640px;
+      min-height: clamp(520px, 70vh, 640px);
     }
 
     .jb-badge {
@@ -1083,9 +1095,9 @@ code:
       display: flex;
       flex-wrap: wrap;
       gap: 0.06em;
-      max-width: 9ch;
+      max-width: 10.5ch;
       margin: 18px 0 0;
-      font-size: clamp(4rem, 9vw, 8rem);
+      font-size: clamp(3.2rem, 7vw, 6.8rem);
       line-height: 0.9;
       letter-spacing: -0.08em;
     }
@@ -1099,7 +1111,7 @@ code:
     }
 
     .jb-copy {
-      max-width: 34rem;
+      max-width: 30rem;
       margin: 18px 0 0;
       line-height: 1.8;
       font-size: 1rem;
@@ -1167,7 +1179,7 @@ code:
 
     .jb-visual-column {
       position: relative;
-      min-height: 640px;
+      min-height: clamp(520px, 68vh, 640px);
       padding: 8px 0 0;
     }
 
@@ -1209,14 +1221,14 @@ code:
     .jb-visual-card-main {
       top: 0;
       right: 20px;
-      width: min(100%, 380px);
+      width: min(100%, 350px);
       padding: 28px;
     }
 
     .jb-visual-card-side {
       top: 178px;
       left: 0;
-      width: min(78%, 300px);
+      width: min(76%, 280px);
       padding: 24px;
       background: linear-gradient(180deg, rgba(255, 133, 95, 0.16), rgba(13, 15, 22, 0.88));
     }
@@ -1232,7 +1244,7 @@ code:
       position: absolute;
       right: 0;
       bottom: 0;
-      width: min(100%, 420px);
+      width: min(100%, 380px);
       display: grid;
       gap: 14px;
     }
@@ -1252,6 +1264,16 @@ code:
     .jb-footer-copy {
       max-width: 32rem;
       line-height: 1.7;
+    }
+
+    @media (max-width: 1280px) {
+      .jb-title {
+        font-size: clamp(3rem, 6.4vw, 5.8rem);
+      }
+
+      .jb-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
 
     @media (max-width: 1080px) {
