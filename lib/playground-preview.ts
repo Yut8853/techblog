@@ -151,6 +151,22 @@ function stripModuleSyntax(source: string): string {
 }
 
 export function extractComponentName(source: string): string {
+  const preferredNames = ['Demo', 'App', 'Component', 'Hero'];
+
+  for (const name of preferredNames) {
+    const preferredFunction = new RegExp(`function\\s+${name}\\s*\\(`);
+    if (preferredFunction.test(source)) {
+      return name;
+    }
+
+    const preferredConst = new RegExp(
+      `const\\s+${name}\\s*=\\s*(?:\\(|React\\.|forwardRef|memo)`
+    );
+    if (preferredConst.test(source)) {
+      return name;
+    }
+  }
+
   const functionMatch = source.match(/function\s+(\w+)\s*\(/);
   if (functionMatch) {
     return functionMatch[1];

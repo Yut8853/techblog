@@ -1,6 +1,6 @@
 ---
-title: Glass Bokeh WebGL Hero
-description: 淡いボケとガラス質の3Dシェイプで、導入セクションに高級感と奥行きを足すWebGL背景表現です。
+title: Bokeh Gradient WebGL Hero
+description: 淡いボケ、円形アクセント、ゆるいライン模様で、導入セクションに奥行きを足すWebGL背景表現です。
 category: 3D・WebGL寄り
 tags:
   - WebGL
@@ -20,119 +20,122 @@ files:
   - name: Component.jsx
     language: jsx
     content: |
-      const UNICORN_SDK_VERSION = '2.1.12'
-      const SCENE_SRC = '/unicorn/bokeh-gradient-shape-stack.json.txt'
-      
-      function loadUnicornStudioSdk() {
-        return new Promise((resolve, reject) => {
-          if (typeof window === 'undefined') {
-            reject(new Error('ブラウザ環境でのみ実行できます'))
-            return
-          }
-      
-          if (window.UnicornStudio?.init) {
-            resolve(window.UnicornStudio)
-            return
-          }
-      
-          const existingScript = document.querySelector('[data-unicorn-studio-sdk="true"]')
-      
-          if (existingScript) {
-            existingScript.addEventListener('load', () => resolve(window.UnicornStudio), { once: true })
-            existingScript.addEventListener(
-              'error',
-              () => reject(new Error('Unicorn Studio SDK の読み込みに失敗しました')),
-              { once: true }
-            )
-            return
-          }
-      
-          const script = document.createElement('script')
-          script.src = `https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v${UNICORN_SDK_VERSION}/dist/unicornStudio.umd.js`
-          script.async = true
-          script.dataset.unicornStudioSdk = 'true'
-          script.onload = () => resolve(window.UnicornStudio)
-          script.onerror = () => reject(new Error('Unicorn Studio SDK の読み込みに失敗しました'))
-          document.body.appendChild(script)
-        })
-      }
+      import { createBokehProgram } from './webgl/createBokehProgram.js'
       
       function Demo() {
-        const sceneHostRef = React.useRef(null)
-        const sceneInstanceRef = React.useRef(null)
+        const canvasRef = React.useRef(null)
+        const mouseRef = React.useRef({ x: 0.5, y: 0.5 })
         const [status, setStatus] = React.useState('loading')
         const [message, setMessage] = React.useState('')
       
         React.useEffect(() => {
+          const canvas = canvasRef.current
           let isMounted = true
+          let frameId = 0
+          let resizeObserver
       
-          async function initScene() {
-            try {
-              const UnicornStudio = await loadUnicornStudioSdk()
-              const host = sceneHostRef.current
+          try {
+            if (!canvas) {
+              throw new Error('Canvasを初期化できませんでした')
+            }
       
-              if (!isMounted || !host) return
+            const gl = canvas.getContext('webgl', {
+              alpha: false,
+              antialias: true,
+              powerPreference: 'high-performance',
+            })
       
-              sceneInstanceRef.current?.destroy?.()
-              sceneInstanceRef.current = null
-              host.innerHTML = ''
+            if (!gl) {
+              throw new Error('WebGLを利用できません')
+            }
       
-              const scenes = await UnicornStudio.init()
-              const ownScene = scenes.find((scene) => {
-                return scene.element === host || scene.el === host || scene.domElement === host
-              })
+            const program = createBokehProgram(gl)
+            const positionBuffer = gl.createBuffer()
+            const positionLocation = gl.getAttribLocation(program, 'a_position')
+            const resolutionLocation = gl.getUniformLocation(program, 'u_resolution')
+            const timeLocation = gl.getUniformLocation(program, 'u_time')
+            const mouseLocation = gl.getUniformLocation(program, 'u_mouse')
       
-              if (!isMounted) return
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+            gl.bufferData(
+              gl.ARRAY_BUFFER,
+              new Float32Array([-1, -1, 3, -1, -1, 3]),
+              gl.STATIC_DRAW
+            )
       
-              sceneInstanceRef.current = ownScene || scenes[scenes.length - 1] || null
+            function resize() {
+              const ratio = Math.min(window.devicePixelRatio || 1, 1.5)
+              const width = Math.max(1, Math.floor(canvas.clientWidth * ratio))
+              const height = Math.max(1, Math.floor(canvas.clientHeight * ratio))
+      
+              if (canvas.width !== width || canvas.height !== height) {
+                canvas.width = width
+                canvas.height = height
+                gl.viewport(0, 0, width, height)
+              }
+            }
+      
+            function render(now) {
+              resize()
+              gl.useProgram(program)
+              gl.enableVertexAttribArray(positionLocation)
+              gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+              gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0)
+              gl.uniform2f(resolutionLocation, canvas.width, canvas.height)
+              gl.uniform1f(timeLocation, now * 0.001)
+              gl.uniform2f(mouseLocation, mouseRef.current.x, mouseRef.current.y)
+              gl.drawArrays(gl.TRIANGLES, 0, 3)
+              frameId = window.requestAnimationFrame(render)
+            }
+      
+            resizeObserver = new ResizeObserver(resize)
+            resizeObserver.observe(canvas)
+            frameId = window.requestAnimationFrame(render)
+      
+            if (isMounted) {
               setStatus('ready')
-            } catch (error) {
-              if (!isMounted) return
+            }
+          } catch (error) {
+            if (isMounted) {
               setStatus('error')
               setMessage(error?.message || 'WebGLシーンを読み込めませんでした')
             }
           }
       
-          initScene()
-      
           return () => {
             isMounted = false
-            sceneInstanceRef.current?.destroy?.()
-            sceneInstanceRef.current = null
+            window.cancelAnimationFrame(frameId)
+            resizeObserver?.disconnect()
           }
         }, [])
       
+        function handlePointerMove(event) {
+          const rect = event.currentTarget.getBoundingClientRect()
+          mouseRef.current = {
+            x: (event.clientX - rect.left) / rect.width,
+            y: 1 - (event.clientY - rect.top) / rect.height,
+          }
+        }
+      
+        function handlePointerLeave() {
+          mouseRef.current = { x: 0.5, y: 0.5 }
+        }
+      
         return (
-          <section className="glass-bokeh-stage">
-            <div className="glass-bokeh-shell">
-              <div
-                ref={sceneHostRef}
-                className="glass-bokeh-scene"
-                data-us-project-src={SCENE_SRC}
-                data-us-scale="0.82"
-                data-us-dpi="1.25"
-                data-us-fps="60"
-                data-us-lazyload="false"
-                data-us-production="true"
-                data-us-alttext="Glassy bokeh WebGL background"
-                data-us-arialabel="Decorative glassy WebGL background animation"
+          <section className="bokeh-gradient-stage">
+            <div className="bokeh-gradient-shell">
+              <canvas
+                ref={canvasRef}
+                className="bokeh-gradient-scene"
+                aria-label="Decorative WebGL background animation"
+                onPointerMove={handlePointerMove}
+                onPointerLeave={handlePointerLeave}
               />
       
-              <div className="glass-bokeh-veil" />
+              <div className="bokeh-gradient-veil" />
       
               <div className="hero-copy">
-                <span className="hero-kicker">WEBGL VISUAL SYSTEM</span>
-                <h1>淡いボケとガラス質の3Dで、導入に余白と奥行きをつくる。</h1>
-                <p>
-                  背景全体は静かに動かし、前面のコピーは読みやすく固定する。
-                  ビジュアルの強さを演出に使いながら、主役はあくまでメッセージに残す構成です。
-                </p>
-      
-                <div className="hero-actions" aria-label="Use cases">
-                  <span>Hero</span>
-                  <span>SaaS LP</span>
-                  <span>Portfolio</span>
-                </div>
+                <h1>JUNK</h1>
               </div>
       
               <div className="scene-status" data-visible={status !== 'ready'}>
@@ -142,6 +145,270 @@ files:
           </section>
         )
       }
+      
+  - name: webgl/createBokehProgram.js
+    language: js
+    content: |
+      import { vertexShaderSource } from '../shaders/vertexShader.js'
+      import { fragmentShaderSource } from '../shaders/fragmentShader.js'
+      
+      function createShader(gl, type, source) {
+        const shader = gl.createShader(type)
+        gl.shaderSource(shader, source)
+        gl.compileShader(shader)
+      
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          throw new Error(gl.getShaderInfoLog(shader) || 'Shader compile failed')
+        }
+      
+        return shader
+      }
+      
+      export function createBokehProgram(gl) {
+        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
+        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource)
+        const program = gl.createProgram()
+      
+        gl.attachShader(program, vertexShader)
+        gl.attachShader(program, fragmentShader)
+        gl.linkProgram(program)
+      
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          throw new Error(gl.getProgramInfoLog(program) || 'Program link failed')
+        }
+      
+        return program
+      }
+  - name: shaders/vertexShader.js
+    language: js
+    content: |
+      export const vertexShaderSource = `
+        attribute vec2 a_position;
+        varying vec2 v_uv;
+      
+        void main() {
+          v_uv = a_position * 0.5 + 0.5;
+          gl_Position = vec4(a_position, 0.0, 1.0);
+        }
+      `
+  - name: shaders/fragmentShader.js
+    language: js
+    content: |
+      export const fragmentShaderSource = `
+      precision highp float;
+      
+      varying vec2 v_uv;
+      uniform vec2 u_resolution;
+      uniform float u_time;
+      uniform vec2 u_mouse;
+      
+      const float PI = 3.14159265359;
+      
+      mat2 rotate2d(float angle) {
+        float s = sin(angle);
+        float c = cos(angle);
+        return mat2(c, -s, s, c);
+      }
+      
+      float hash(vec2 p) {
+        p = fract(p * vec2(123.34, 456.21));
+        p += dot(p, p + 45.32);
+        return fract(p.x * p.y);
+      }
+      
+      float noise(vec3 p) {
+        vec3 i = floor(p);
+        vec3 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+      
+        float n000 = hash(i.xy + vec2(17.0, 29.0) * i.z);
+        float n100 = hash(i.xy + vec2(1.0, 0.0) + vec2(17.0, 29.0) * i.z);
+        float n010 = hash(i.xy + vec2(0.0, 1.0) + vec2(17.0, 29.0) * i.z);
+        float n110 = hash(i.xy + vec2(1.0, 1.0) + vec2(17.0, 29.0) * i.z);
+        float n001 = hash(i.xy + vec2(17.0, 29.0) * (i.z + 1.0));
+        float n101 = hash(i.xy + vec2(1.0, 0.0) + vec2(17.0, 29.0) * (i.z + 1.0));
+        float n011 = hash(i.xy + vec2(0.0, 1.0) + vec2(17.0, 29.0) * (i.z + 1.0));
+        float n111 = hash(i.xy + vec2(1.0, 1.0) + vec2(17.0, 29.0) * (i.z + 1.0));
+      
+        float nx00 = mix(n000, n100, f.x);
+        float nx10 = mix(n010, n110, f.x);
+        float nx01 = mix(n001, n101, f.x);
+        float nx11 = mix(n011, n111, f.x);
+        float nxy0 = mix(nx00, nx10, f.y);
+        float nxy1 = mix(nx01, nx11, f.y);
+        return mix(nxy0, nxy1, f.z);
+      }
+      
+      float ellipseMask(vec2 uv, vec2 center, vec2 radius, float rotation) {
+        vec2 p = (uv - center) * rotate2d(rotation);
+        p /= radius;
+        return 1.0 - smoothstep(0.82, 1.0, dot(p, p));
+      }
+      
+      float circleMask(vec2 uv, vec2 center, float radius) {
+        float d = distance(uv, center);
+        return 1.0 - smoothstep(radius * 0.92, radius, d);
+      }
+      
+      vec3 gradientColor(float x) {
+        x = clamp(x, 0.0, 1.0);
+        vec3 c0 = vec3(0.686, 0.725, 1.0);
+        vec3 c1 = vec3(0.702, 0.753, 0.996);
+        vec3 c2 = vec3(0.929, 0.941, 1.0);
+        vec3 c3 = vec3(0.855, 0.969, 1.0);
+      
+        if (x < 0.30) return mix(c0, c1, smoothstep(0.044, 0.30, x));
+        if (x < 0.653) return mix(c1, c2, smoothstep(0.30, 0.653, x));
+        return mix(c2, c3, smoothstep(0.653, 1.0, x));
+      }
+      
+      float linePattern(vec2 uv, float density, float width, float phase) {
+        float wave = sin((uv.x * density + phase) * PI);
+        return 1.0 - smoothstep(width, width + 0.08, abs(wave));
+      }
+      
+      vec3 environmentMap(vec3 dir) {
+        dir = normalize(dir);
+        vec2 envUv = vec2(atan(dir.z, dir.x) / (2.0 * PI) + 0.5, asin(clamp(dir.y, -1.0, 1.0)) / PI + 0.5);
+        vec2 p = envUv;
+        float n = noise(vec3(p * 4.0, u_time * 0.06));
+        vec2 rotated = rotate2d(n * 1.6 - 0.8) * (p - 0.5);
+      
+        vec3 color = gradientColor(p.x * 0.75 + p.y * 0.25);
+        color = mix(color, vec3(0.965, 0.985, 1.0), smoothstep(0.2, 0.95, p.y) * 0.26);
+      
+        float creamCircle = circleMask(vec2(p.x * 1.6, p.y), vec2(0.9, 0.32), 0.24);
+        color = 1.0 - (1.0 - color) * (1.0 - vec3(1.0, 0.925, 0.839) * creamCircle * 0.68);
+      
+        float blueLine = linePattern(rotated + vec2(0.18, 0.0), 16.0, 0.035, 0.08);
+        float warmLine = linePattern(rotated.yx + vec2(-0.12, 0.0), 11.0, 0.03, 0.42);
+        float lineWindow = smoothstep(0.08, 0.42, p.x) * (1.0 - smoothstep(0.9, 1.0, p.x));
+        color += vec3(0.12, 0.44, 1.0) * blueLine * lineWindow * 0.32;
+        color += vec3(1.0, 0.72, 0.34) * warmLine * lineWindow * 0.22;
+      
+        float glowA = ellipseMask(vec2(p.x * 1.6, p.y), vec2(0.34, 0.66), vec2(0.5, 0.34), 0.2);
+        float glowB = ellipseMask(vec2(p.x * 1.6, p.y), vec2(1.22, 0.58), vec2(0.48, 0.36), -0.2);
+        color += vec3(0.2, 0.4, 1.0) * glowA * 0.12;
+        color += vec3(0.48, 0.95, 1.0) * glowB * 0.13;
+      
+        return color;
+      }
+      
+      vec3 backgroundColor(vec2 uv) {
+        vec2 ndc = uv * 2.0 - 1.0;
+        ndc.x *= u_resolution.x / u_resolution.y;
+        vec3 dir = normalize(vec3(ndc * 0.95, -1.25));
+        return environmentMap(dir);
+      }
+      
+      float sphereHit(vec3 ro, vec3 rd, vec3 center, float radius) {
+        vec3 oc = ro - center;
+        float b = dot(oc, rd);
+        float c = dot(oc, oc) - radius * radius;
+        float h = b * b - c;
+        if (h < 0.0) return -1.0;
+        h = sqrt(h);
+        float t = -b - h;
+        if (t > 0.0) return t;
+        return -b + h;
+      }
+      
+      float shapeHit(vec3 ro, vec3 rd, out vec3 center, out float radius) {
+        vec2 mouse = (u_mouse - 0.5) * vec2(0.12, -0.08);
+        vec3 c0 = vec3(0.52 + mouse.x, 0.08 + mouse.y, 0.02);
+        vec3 c1 = vec3(0.33 + mouse.x, -0.18 + mouse.y, 0.04);
+        vec3 c2 = vec3(0.72 + mouse.x, 0.27 + mouse.y, -0.02);
+        float r0 = 0.48;
+        float r1 = 0.28;
+        float r2 = 0.22;
+      
+        float t0 = sphereHit(ro, rd, c0, r0);
+        float t1 = sphereHit(ro, rd, c1, r1);
+        float t2 = sphereHit(ro, rd, c2, r2);
+        float t = 999.0;
+        center = c0;
+        radius = r0;
+      
+        if (t0 > 0.0 && t0 < t) { t = t0; center = c0; radius = r0; }
+        if (t1 > 0.0 && t1 < t) { t = t1; center = c1; radius = r1; }
+        if (t2 > 0.0 && t2 < t) { t = t2; center = c2; radius = r2; }
+      
+        if (t > 998.0) return -1.0;
+        return t;
+      }
+      
+      vec3 renderShape(vec2 uv, vec3 bg) {
+        vec2 p = uv * 2.0 - 1.0;
+        p.x *= u_resolution.x / u_resolution.y;
+        vec3 ro = vec3(0.0, 0.0, 2.55);
+        vec3 rd = normalize(vec3(p * 0.92, -1.72));
+      
+        vec3 center;
+        float radius;
+        float hitT = shapeHit(ro, rd, center, radius);
+        if (hitT < 0.0) return bg;
+      
+        vec3 hitPos = ro + rd * hitT;
+        vec3 normal = normalize(hitPos - center);
+        float surfaceNoise = noise(hitPos * 9.0 + vec3(u_time * 0.16));
+        normal = normalize(normal + vec3(surfaceNoise - 0.5, noise(hitPos.yzx * 8.0) - 0.5, noise(hitPos.zxy * 8.0) - 0.5) * 0.18);
+      
+        vec3 reflectDir = reflect(rd, normal);
+        vec3 refractR = refract(rd, normal, 0.78);
+        vec3 refractG = refract(rd, normal, 0.80);
+        vec3 refractB = refract(rd, normal, 0.82);
+      
+        vec3 reflected = environmentMap(reflectDir);
+        vec3 refracted = vec3(
+          environmentMap(refractR).r,
+          environmentMap(refractG).g,
+          environmentMap(refractB).b
+        );
+      
+        float fresnel = 0.08 + 1.85 * pow(1.0 + dot(rd, normal), 2.4);
+        fresnel = clamp(fresnel, 0.0, 1.0);
+        vec3 light = normalize(vec3(-0.4, 0.72, 0.55));
+        float spec = pow(max(dot(reflect(rd, normal), light), 0.0), 72.0);
+        float rim = pow(1.0 - max(dot(-rd, normal), 0.0), 2.0);
+      
+        vec3 shapeColor = mix(refracted, reflected, fresnel);
+        shapeColor = mix(shapeColor, vec3(0.82, 0.93, 1.0), 0.08);
+        shapeColor += vec3(1.0) * spec * 0.95;
+        shapeColor += vec3(0.7, 0.92, 1.0) * rim * 0.58;
+        shapeColor += vec3(1.0, 0.74, 0.36) * pow(rim, 2.4) * 0.16;
+      
+        float silhouette = smoothstep(0.0, radius, length(hitPos - center));
+        float alpha = 0.82 + silhouette * 0.12;
+        return mix(bg, shapeColor, alpha);
+      }
+      
+      float bokehDisc(vec2 uv, vec2 center, float radius, float softness) {
+        float d = distance(uv, center);
+        return 1.0 - smoothstep(radius - softness, radius, d);
+      }
+      
+      void main() {
+        vec2 uv = v_uv;
+        vec3 color = backgroundColor(uv);
+        color = renderShape(uv, color);
+      
+        vec2 bokehOrigin = vec2(0.472, 0.489) + (u_mouse - 0.5) * 0.075;
+        float bokeh = 0.0;
+        bokeh += bokehDisc(uv, bokehOrigin + vec2(-0.18, 0.12), 0.085, 0.07);
+        bokeh += bokehDisc(uv, bokehOrigin + vec2(0.28, -0.16), 0.115, 0.09);
+        bokeh += bokehDisc(uv, bokehOrigin + vec2(0.38, 0.18), 0.06, 0.05);
+        bokeh += bokehDisc(uv, bokehOrigin + vec2(-0.34, -0.2), 0.045, 0.04);
+        color += vec3(1.0, 0.97, 0.9) * bokeh * 0.13;
+      
+        float vignette = 1.0 - smoothstep(0.18, 0.92, distance((uv - vec2(0.479, 0.508)) * vec2(0.5 * u_resolution.x / u_resolution.y, 0.5), vec2(0.0)));
+        color = mix(color * 0.68, color, vignette);
+      
+        float grain = hash(gl_FragCoord.xy + floor(u_time * 18.0));
+        color = mix(color, min(color, vec3(grain)), 0.045);
+      
+        gl_FragColor = vec4(color, 1.0);
+      }
+      `
   - name: styles.css
     language: css
     content: |
@@ -152,7 +419,7 @@ files:
         color: #0f172a;
       }
       
-      .glass-bokeh-stage {
+      .bokeh-gradient-stage {
         min-height: 100vh;
         display: grid;
         place-items: center;
@@ -163,7 +430,7 @@ files:
           linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
       }
       
-      .glass-bokeh-shell {
+      .bokeh-gradient-shell {
         position: relative;
         width: min(1120px, 100%);
         min-height: min(76vh, 720px);
@@ -177,22 +444,23 @@ files:
         isolation: isolate;
       }
       
-      .glass-bokeh-scene {
+      .bokeh-gradient-scene {
         position: absolute;
         inset: 0;
         z-index: 0;
+        display: block;
         width: 100%;
         height: 100%;
       }
       
-      .glass-bokeh-veil {
+      .bokeh-gradient-veil {
         position: absolute;
         inset: 0;
         z-index: 1;
         pointer-events: none;
         background:
-          linear-gradient(90deg, rgba(248, 250, 252, 0.88) 0%, rgba(248, 250, 252, 0.62) 36%, rgba(248, 250, 252, 0.16) 72%),
-          radial-gradient(circle at 22% 48%, rgba(255, 255, 255, 0.78), transparent 42%),
+          linear-gradient(90deg, rgba(248, 250, 252, 0.8) 0%, rgba(248, 250, 252, 0.42) 36%, rgba(248, 250, 252, 0.04) 72%),
+          radial-gradient(circle at 22% 48%, rgba(255, 255, 255, 0.62), transparent 42%),
           linear-gradient(180deg, rgba(15, 23, 42, 0) 58%, rgba(15, 23, 42, 0.22) 100%);
       }
       
@@ -227,7 +495,7 @@ files:
         margin: 0;
         font-size: clamp(2.7rem, 7vw, 5.8rem);
         line-height: 0.94;
-        letter-spacing: -0.08em;
+        letter-spacing: 0;
       }
       
       .hero-copy p {
@@ -282,13 +550,13 @@ files:
       }
       
       @media (max-width: 720px) {
-        .glass-bokeh-shell {
+        .bokeh-gradient-shell {
           min-height: 640px;
         }
       
-        .glass-bokeh-veil {
+        .bokeh-gradient-veil {
           background:
-            linear-gradient(180deg, rgba(248, 250, 252, 0.92) 0%, rgba(248, 250, 252, 0.58) 58%, rgba(15, 23, 42, 0.2) 100%);
+            linear-gradient(180deg, rgba(248, 250, 252, 0.82) 0%, rgba(248, 250, 252, 0.4) 58%, rgba(15, 23, 42, 0.18) 100%);
         }
       
         .hero-copy {
@@ -302,121 +570,377 @@ files:
           max-width: 11ch;
         }
       }
+      
 code:
   jsx: |
-    const UNICORN_SDK_VERSION = '2.1.12'
-    const SCENE_SRC = '/unicorn/bokeh-gradient-shape-stack.json.txt'
+    const vertexShaderSource = `
+      attribute vec2 a_position;
+      varying vec2 v_uv;
     
-    function loadUnicornStudioSdk() {
-      return new Promise((resolve, reject) => {
-        if (typeof window === 'undefined') {
-          reject(new Error('ブラウザ環境でのみ実行できます'))
-          return
-        }
+      void main() {
+        v_uv = a_position * 0.5 + 0.5;
+        gl_Position = vec4(a_position, 0.0, 1.0);
+      }
+    `
     
-        if (window.UnicornStudio?.init) {
-          resolve(window.UnicornStudio)
-          return
-        }
+    const fragmentShaderSource = `
+    precision highp float;
     
-        const existingScript = document.querySelector('[data-unicorn-studio-sdk="true"]')
+    varying vec2 v_uv;
+    uniform vec2 u_resolution;
+    uniform float u_time;
+    uniform vec2 u_mouse;
     
-        if (existingScript) {
-          existingScript.addEventListener('load', () => resolve(window.UnicornStudio), { once: true })
-          existingScript.addEventListener(
-            'error',
-            () => reject(new Error('Unicorn Studio SDK の読み込みに失敗しました')),
-            { once: true }
-          )
-          return
-        }
+    const float PI = 3.14159265359;
     
-        const script = document.createElement('script')
-        script.src = `https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v${UNICORN_SDK_VERSION}/dist/unicornStudio.umd.js`
-        script.async = true
-        script.dataset.unicornStudioSdk = 'true'
-        script.onload = () => resolve(window.UnicornStudio)
-        script.onerror = () => reject(new Error('Unicorn Studio SDK の読み込みに失敗しました'))
-        document.body.appendChild(script)
-      })
+    mat2 rotate2d(float angle) {
+      float s = sin(angle);
+      float c = cos(angle);
+      return mat2(c, -s, s, c);
+    }
+    
+    float hash(vec2 p) {
+      p = fract(p * vec2(123.34, 456.21));
+      p += dot(p, p + 45.32);
+      return fract(p.x * p.y);
+    }
+    
+    float noise(vec3 p) {
+      vec3 i = floor(p);
+      vec3 f = fract(p);
+      f = f * f * (3.0 - 2.0 * f);
+    
+      float n000 = hash(i.xy + vec2(17.0, 29.0) * i.z);
+      float n100 = hash(i.xy + vec2(1.0, 0.0) + vec2(17.0, 29.0) * i.z);
+      float n010 = hash(i.xy + vec2(0.0, 1.0) + vec2(17.0, 29.0) * i.z);
+      float n110 = hash(i.xy + vec2(1.0, 1.0) + vec2(17.0, 29.0) * i.z);
+      float n001 = hash(i.xy + vec2(17.0, 29.0) * (i.z + 1.0));
+      float n101 = hash(i.xy + vec2(1.0, 0.0) + vec2(17.0, 29.0) * (i.z + 1.0));
+      float n011 = hash(i.xy + vec2(0.0, 1.0) + vec2(17.0, 29.0) * (i.z + 1.0));
+      float n111 = hash(i.xy + vec2(1.0, 1.0) + vec2(17.0, 29.0) * (i.z + 1.0));
+    
+      float nx00 = mix(n000, n100, f.x);
+      float nx10 = mix(n010, n110, f.x);
+      float nx01 = mix(n001, n101, f.x);
+      float nx11 = mix(n011, n111, f.x);
+      float nxy0 = mix(nx00, nx10, f.y);
+      float nxy1 = mix(nx01, nx11, f.y);
+      return mix(nxy0, nxy1, f.z);
+    }
+    
+    float ellipseMask(vec2 uv, vec2 center, vec2 radius, float rotation) {
+      vec2 p = (uv - center) * rotate2d(rotation);
+      p /= radius;
+      return 1.0 - smoothstep(0.82, 1.0, dot(p, p));
+    }
+      
+    float circleMask(vec2 uv, vec2 center, float radius) {
+      float d = distance(uv, center);
+      return 1.0 - smoothstep(radius * 0.92, radius, d);
+    }
+    
+    vec3 gradientColor(float x) {
+      x = clamp(x, 0.0, 1.0);
+      vec3 c0 = vec3(0.686, 0.725, 1.0);
+      vec3 c1 = vec3(0.702, 0.753, 0.996);
+      vec3 c2 = vec3(0.929, 0.941, 1.0);
+      vec3 c3 = vec3(0.855, 0.969, 1.0);
+    
+      if (x < 0.30) return mix(c0, c1, smoothstep(0.044, 0.30, x));
+      if (x < 0.653) return mix(c1, c2, smoothstep(0.30, 0.653, x));
+      return mix(c2, c3, smoothstep(0.653, 1.0, x));
+    }
+    
+    float linePattern(vec2 uv, float density, float width, float phase) {
+      float wave = sin((uv.x * density + phase) * PI);
+      return 1.0 - smoothstep(width, width + 0.08, abs(wave));
+    }
+    
+    vec3 environmentMap(vec3 dir) {
+      dir = normalize(dir);
+      vec2 envUv = vec2(atan(dir.z, dir.x) / (2.0 * PI) + 0.5, asin(clamp(dir.y, -1.0, 1.0)) / PI + 0.5);
+      vec2 p = envUv;
+      float n = noise(vec3(p * 4.0, u_time * 0.06));
+      vec2 rotated = rotate2d(n * 1.6 - 0.8) * (p - 0.5);
+    
+      vec3 color = gradientColor(p.x * 0.75 + p.y * 0.25);
+      color = mix(color, vec3(0.965, 0.985, 1.0), smoothstep(0.2, 0.95, p.y) * 0.26);
+    
+      float creamCircle = circleMask(vec2(p.x * 1.6, p.y), vec2(0.9, 0.32), 0.24);
+      color = 1.0 - (1.0 - color) * (1.0 - vec3(1.0, 0.925, 0.839) * creamCircle * 0.68);
+    
+      float blueLine = linePattern(rotated + vec2(0.18, 0.0), 16.0, 0.035, 0.08);
+      float warmLine = linePattern(rotated.yx + vec2(-0.12, 0.0), 11.0, 0.03, 0.42);
+      float lineWindow = smoothstep(0.08, 0.42, p.x) * (1.0 - smoothstep(0.9, 1.0, p.x));
+      color += vec3(0.12, 0.44, 1.0) * blueLine * lineWindow * 0.32;
+      color += vec3(1.0, 0.72, 0.34) * warmLine * lineWindow * 0.22;
+    
+      float glowA = ellipseMask(vec2(p.x * 1.6, p.y), vec2(0.34, 0.66), vec2(0.5, 0.34), 0.2);
+      float glowB = ellipseMask(vec2(p.x * 1.6, p.y), vec2(1.22, 0.58), vec2(0.48, 0.36), -0.2);
+      color += vec3(0.2, 0.4, 1.0) * glowA * 0.12;
+      color += vec3(0.48, 0.95, 1.0) * glowB * 0.13;
+    
+      return color;
+    }
+    
+    vec3 backgroundColor(vec2 uv) {
+      vec2 ndc = uv * 2.0 - 1.0;
+      ndc.x *= u_resolution.x / u_resolution.y;
+      vec3 dir = normalize(vec3(ndc * 0.95, -1.25));
+      return environmentMap(dir);
+    }
+    
+    float sphereHit(vec3 ro, vec3 rd, vec3 center, float radius) {
+      vec3 oc = ro - center;
+      float b = dot(oc, rd);
+      float c = dot(oc, oc) - radius * radius;
+      float h = b * b - c;
+      if (h < 0.0) return -1.0;
+      h = sqrt(h);
+      float t = -b - h;
+      if (t > 0.0) return t;
+      return -b + h;
+    }
+    
+    float shapeHit(vec3 ro, vec3 rd, out vec3 center, out float radius) {
+      vec2 mouse = (u_mouse - 0.5) * vec2(0.12, -0.08);
+      vec3 c0 = vec3(0.52 + mouse.x, 0.08 + mouse.y, 0.02);
+      vec3 c1 = vec3(0.33 + mouse.x, -0.18 + mouse.y, 0.04);
+      vec3 c2 = vec3(0.72 + mouse.x, 0.27 + mouse.y, -0.02);
+      float r0 = 0.48;
+      float r1 = 0.28;
+      float r2 = 0.22;
+    
+      float t0 = sphereHit(ro, rd, c0, r0);
+      float t1 = sphereHit(ro, rd, c1, r1);
+      float t2 = sphereHit(ro, rd, c2, r2);
+      float t = 999.0;
+      center = c0;
+      radius = r0;
+    
+      if (t0 > 0.0 && t0 < t) { t = t0; center = c0; radius = r0; }
+      if (t1 > 0.0 && t1 < t) { t = t1; center = c1; radius = r1; }
+      if (t2 > 0.0 && t2 < t) { t = t2; center = c2; radius = r2; }
+    
+      if (t > 998.0) return -1.0;
+      return t;
+    }
+    
+    vec3 renderShape(vec2 uv, vec3 bg) {
+      vec2 p = uv * 2.0 - 1.0;
+      p.x *= u_resolution.x / u_resolution.y;
+      vec3 ro = vec3(0.0, 0.0, 2.55);
+      vec3 rd = normalize(vec3(p * 0.92, -1.72));
+    
+      vec3 center;
+      float radius;
+      float hitT = shapeHit(ro, rd, center, radius);
+      if (hitT < 0.0) return bg;
+    
+      vec3 hitPos = ro + rd * hitT;
+      vec3 normal = normalize(hitPos - center);
+      float surfaceNoise = noise(hitPos * 9.0 + vec3(u_time * 0.16));
+      normal = normalize(normal + vec3(surfaceNoise - 0.5, noise(hitPos.yzx * 8.0) - 0.5, noise(hitPos.zxy * 8.0) - 0.5) * 0.18);
+    
+      vec3 reflectDir = reflect(rd, normal);
+      vec3 refractR = refract(rd, normal, 0.78);
+      vec3 refractG = refract(rd, normal, 0.80);
+      vec3 refractB = refract(rd, normal, 0.82);
+    
+      vec3 reflected = environmentMap(reflectDir);
+      vec3 refracted = vec3(
+        environmentMap(refractR).r,
+        environmentMap(refractG).g,
+        environmentMap(refractB).b
+      );
+    
+      float fresnel = 0.08 + 1.85 * pow(1.0 + dot(rd, normal), 2.4);
+      fresnel = clamp(fresnel, 0.0, 1.0);
+      vec3 light = normalize(vec3(-0.4, 0.72, 0.55));
+      float spec = pow(max(dot(reflect(rd, normal), light), 0.0), 72.0);
+      float rim = pow(1.0 - max(dot(-rd, normal), 0.0), 2.0);
+    
+      vec3 shapeColor = mix(refracted, reflected, fresnel);
+      shapeColor = mix(shapeColor, vec3(0.82, 0.93, 1.0), 0.08);
+      shapeColor += vec3(1.0) * spec * 0.95;
+      shapeColor += vec3(0.7, 0.92, 1.0) * rim * 0.58;
+      shapeColor += vec3(1.0, 0.74, 0.36) * pow(rim, 2.4) * 0.16;
+    
+      float silhouette = smoothstep(0.0, radius, length(hitPos - center));
+      float alpha = 0.82 + silhouette * 0.12;
+      return mix(bg, shapeColor, alpha);
+    }
+    
+    float bokehDisc(vec2 uv, vec2 center, float radius, float softness) {
+      float d = distance(uv, center);
+      return 1.0 - smoothstep(radius - softness, radius, d);
+    }
+    
+    void main() {
+      vec2 uv = v_uv;
+      vec3 color = backgroundColor(uv);
+      color = renderShape(uv, color);
+    
+      vec2 bokehOrigin = vec2(0.472, 0.489) + (u_mouse - 0.5) * 0.075;
+      float bokeh = 0.0;
+      bokeh += bokehDisc(uv, bokehOrigin + vec2(-0.18, 0.12), 0.085, 0.07);
+      bokeh += bokehDisc(uv, bokehOrigin + vec2(0.28, -0.16), 0.115, 0.09);
+      bokeh += bokehDisc(uv, bokehOrigin + vec2(0.38, 0.18), 0.06, 0.05);
+      bokeh += bokehDisc(uv, bokehOrigin + vec2(-0.34, -0.2), 0.045, 0.04);
+      color += vec3(1.0, 0.97, 0.9) * bokeh * 0.13;
+    
+      float vignette = 1.0 - smoothstep(0.18, 0.92, distance((uv - vec2(0.479, 0.508)) * vec2(0.5 * u_resolution.x / u_resolution.y, 0.5), vec2(0.0)));
+      color = mix(color * 0.68, color, vignette);
+    
+      float grain = hash(gl_FragCoord.xy + floor(u_time * 18.0));
+      color = mix(color, min(color, vec3(grain)), 0.045);
+    
+      gl_FragColor = vec4(color, 1.0);
+    }
+    `
+    
+    function createShader(gl, type, source) {
+      const shader = gl.createShader(type)
+      gl.shaderSource(shader, source)
+      gl.compileShader(shader)
+    
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        throw new Error(gl.getShaderInfoLog(shader) || 'Shader compile failed')
+      }
+    
+      return shader
+    }
+    
+    function createProgram(gl) {
+      const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
+      const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource)
+      const program = gl.createProgram()
+    
+      gl.attachShader(program, vertexShader)
+      gl.attachShader(program, fragmentShader)
+      gl.linkProgram(program)
+    
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        throw new Error(gl.getProgramInfoLog(program) || 'Program link failed')
+      }
+    
+      return program
     }
     
     function Demo() {
-      const sceneHostRef = React.useRef(null)
-      const sceneInstanceRef = React.useRef(null)
+      const canvasRef = React.useRef(null)
+      const mouseRef = React.useRef({ x: 0.5, y: 0.5 })
       const [status, setStatus] = React.useState('loading')
       const [message, setMessage] = React.useState('')
     
       React.useEffect(() => {
+        const canvas = canvasRef.current
         let isMounted = true
+        let frameId = 0
+        let resizeObserver
     
-        async function initScene() {
-          try {
-            const UnicornStudio = await loadUnicornStudioSdk()
-            const host = sceneHostRef.current
+        try {
+          if (!canvas) {
+            throw new Error('Canvasを初期化できませんでした')
+          }
     
-            if (!isMounted || !host) return
+          const gl = canvas.getContext('webgl', {
+            alpha: false,
+            antialias: true,
+            powerPreference: 'high-performance',
+          })
     
-            sceneInstanceRef.current?.destroy?.()
-            sceneInstanceRef.current = null
-            host.innerHTML = ''
+          if (!gl) {
+            throw new Error('WebGLを利用できません')
+          }
     
-            const scenes = await UnicornStudio.init()
-            const ownScene = scenes.find((scene) => {
-              return scene.element === host || scene.el === host || scene.domElement === host
-            })
+          const program = createProgram(gl)
+          const positionBuffer = gl.createBuffer()
+          const positionLocation = gl.getAttribLocation(program, 'a_position')
+          const resolutionLocation = gl.getUniformLocation(program, 'u_resolution')
+          const timeLocation = gl.getUniformLocation(program, 'u_time')
+          const mouseLocation = gl.getUniformLocation(program, 'u_mouse')
     
-            if (!isMounted) return
+          gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+          gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array([-1, -1, 3, -1, -1, 3]),
+            gl.STATIC_DRAW
+          )
     
-            sceneInstanceRef.current = ownScene || scenes[scenes.length - 1] || null
+          function resize() {
+            const ratio = Math.min(window.devicePixelRatio || 1, 1.5)
+            const width = Math.max(1, Math.floor(canvas.clientWidth * ratio))
+            const height = Math.max(1, Math.floor(canvas.clientHeight * ratio))
+    
+            if (canvas.width !== width || canvas.height !== height) {
+              canvas.width = width
+              canvas.height = height
+              gl.viewport(0, 0, width, height)
+            }
+          }
+    
+          function render(now) {
+            resize()
+            gl.useProgram(program)
+            gl.enableVertexAttribArray(positionLocation)
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0)
+            gl.uniform2f(resolutionLocation, canvas.width, canvas.height)
+            gl.uniform1f(timeLocation, now * 0.001)
+            gl.uniform2f(mouseLocation, mouseRef.current.x, mouseRef.current.y)
+            gl.drawArrays(gl.TRIANGLES, 0, 3)
+            frameId = window.requestAnimationFrame(render)
+          }
+    
+          resizeObserver = new ResizeObserver(resize)
+          resizeObserver.observe(canvas)
+          frameId = window.requestAnimationFrame(render)
+    
+          if (isMounted) {
             setStatus('ready')
-          } catch (error) {
-            if (!isMounted) return
+          }
+        } catch (error) {
+          if (isMounted) {
             setStatus('error')
             setMessage(error?.message || 'WebGLシーンを読み込めませんでした')
           }
         }
     
-        initScene()
-    
         return () => {
           isMounted = false
-          sceneInstanceRef.current?.destroy?.()
-          sceneInstanceRef.current = null
+          window.cancelAnimationFrame(frameId)
+          resizeObserver?.disconnect()
         }
       }, [])
     
+      function handlePointerMove(event) {
+        const rect = event.currentTarget.getBoundingClientRect()
+        mouseRef.current = {
+          x: (event.clientX - rect.left) / rect.width,
+          y: 1 - (event.clientY - rect.top) / rect.height,
+        }
+      }
+    
+      function handlePointerLeave() {
+        mouseRef.current = { x: 0.5, y: 0.5 }
+      }
+    
       return (
-        <section className="glass-bokeh-stage">
-          <div className="glass-bokeh-shell">
-            <div
-              ref={sceneHostRef}
-              className="glass-bokeh-scene"
-              data-us-project-src={SCENE_SRC}
-              data-us-scale="0.82"
-              data-us-dpi="1.25"
-              data-us-fps="60"
-              data-us-lazyload="false"
-              data-us-production="true"
-              data-us-alttext="Glassy bokeh WebGL background"
-              data-us-arialabel="Decorative glassy WebGL background animation"
+        <section className="bokeh-gradient-stage">
+          <div className="bokeh-gradient-shell">
+            <canvas
+              ref={canvasRef}
+              className="bokeh-gradient-scene"
+              aria-label="Decorative WebGL background animation"
+              onPointerMove={handlePointerMove}
+              onPointerLeave={handlePointerLeave}
             />
     
-            <div className="glass-bokeh-veil" />
+            <div className="bokeh-gradient-veil" />
     
             <div className="hero-copy">
-              <span className="hero-kicker">WEBGL VISUAL SYSTEM</span>
-              <h1>淡いボケとガラス質の3Dで、導入に余白と奥行きをつくる。</h1>
-              <p>
-                背景全体は静かに動かし、前面のコピーは読みやすく固定する。
-                ビジュアルの強さを演出に使いながら、主役はあくまでメッセージに残す構成です。
-              </p>
-    
-              <div className="hero-actions" aria-label="Use cases">
-                <span>Hero</span>
-                <span>SaaS LP</span>
-                <span>Portfolio</span>
-              </div>
+              <h1>JUNK</h1>
             </div>
     
             <div className="scene-status" data-visible={status !== 'ready'}>
@@ -434,7 +958,7 @@ code:
       color: #0f172a;
     }
     
-    .glass-bokeh-stage {
+    .bokeh-gradient-stage {
       min-height: 100vh;
       display: grid;
       place-items: center;
@@ -445,7 +969,7 @@ code:
         linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
     }
     
-    .glass-bokeh-shell {
+    .bokeh-gradient-shell {
       position: relative;
       width: min(1120px, 100%);
       min-height: min(76vh, 720px);
@@ -459,22 +983,23 @@ code:
       isolation: isolate;
     }
     
-    .glass-bokeh-scene {
+    .bokeh-gradient-scene {
       position: absolute;
       inset: 0;
       z-index: 0;
+      display: block;
       width: 100%;
       height: 100%;
     }
     
-    .glass-bokeh-veil {
+    .bokeh-gradient-veil {
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
       background:
-        linear-gradient(90deg, rgba(248, 250, 252, 0.88) 0%, rgba(248, 250, 252, 0.62) 36%, rgba(248, 250, 252, 0.16) 72%),
-        radial-gradient(circle at 22% 48%, rgba(255, 255, 255, 0.78), transparent 42%),
+        linear-gradient(90deg, rgba(248, 250, 252, 0.8) 0%, rgba(248, 250, 252, 0.42) 36%, rgba(248, 250, 252, 0.04) 72%),
+        radial-gradient(circle at 22% 48%, rgba(255, 255, 255, 0.62), transparent 42%),
         linear-gradient(180deg, rgba(15, 23, 42, 0) 58%, rgba(15, 23, 42, 0.22) 100%);
     }
     
@@ -509,7 +1034,7 @@ code:
       margin: 0;
       font-size: clamp(2.7rem, 7vw, 5.8rem);
       line-height: 0.94;
-      letter-spacing: -0.08em;
+      letter-spacing: 0;
     }
     
     .hero-copy p {
@@ -564,13 +1089,13 @@ code:
     }
     
     @media (max-width: 720px) {
-      .glass-bokeh-shell {
+      .bokeh-gradient-shell {
         min-height: 640px;
       }
     
-      .glass-bokeh-veil {
+      .bokeh-gradient-veil {
         background:
-          linear-gradient(180deg, rgba(248, 250, 252, 0.92) 0%, rgba(248, 250, 252, 0.58) 58%, rgba(15, 23, 42, 0.2) 100%);
+          linear-gradient(180deg, rgba(248, 250, 252, 0.82) 0%, rgba(248, 250, 252, 0.4) 58%, rgba(15, 23, 42, 0.18) 100%);
       }
     
       .hero-copy {
@@ -586,43 +1111,37 @@ code:
     }
 ---
 
-## 🎯 企画メモ
+## はじめに
 
-- **今回はこれ以外:** pinされたヒーロー見出しの縮小フェード、単体カードのtilt発光、背景粒子とglass panelの組み合わせ以外
-- **今回の主役:** ガラス質の3Dシェイプと淡いボケで、ファーストビューに高級感を足すWebGL背景
-- **差分:** スクロールやホバーで要素を切り替えるのではなく、常時動く背景を「空気感」として使う
+自分用メモ。
 
-## 📝 はじめに
+ファーストビューの背景は、主張を強くしすぎると文字が読みにくくなる。淡いグラデーション、円形アクセント、少しだけ動くラインを重ねるくらいが扱いやすい。
 
-この表現は、主張の強いアニメーションというより、ページの第一印象を底上げするための背景ビジュアルです。淡いグラデーション、柔らかいボケ、ガラスのような3Dシェイプを重ねることで、SaaSやAIツール、ポートフォリオの導入に「軽さ」と「先進感」を出せます。
+このサンプルでは、WebGLを背景として敷き、前面の文字はDOMで分けている。背景は雰囲気を作る役、文字は読ませる役として分けておく。
 
-ポイントは、WebGLを主役にしすぎないこと。背景はリッチに動かしつつ、前面のコピーには白いベールを重ねて、読ませたい情報のコントラストを守っています。
+## WebGL背景の基本
 
-## 🛠️ 実装のポイント
+ここで見ておくのは、1枚のcanvasで複数の背景要素をまとめて扱える点。CSSだけのグラデーションより、線の揺れや淡い粒感を足しやすい。
 
-- **WebGLは背景レイヤーとして扱う**  
-  `glass-bokeh-scene` を全面に敷き、コピーやラベルは別レイヤーとして上に重ねています。WebGLそのものを見せ場にしつつ、テキストの読みやすさを崩さないためです。
+- ファーストビューに少し奥行きを付けたい
+- 背景にゆるい動きを入れたい
+- 画像ではなくコードで色や形を調整したい
+- 文字の読みやすさはDOM側で保ちたい
 
-- **白いベールで情報設計を整える**  
-  `glass-bokeh-veil` は単なる装飾ではなく、背景の強さを抑えるためのフィルターです。左側を明るく、右側を少し透明にすることで、コピーの視認性とWebGLの見せ場を両立しています。
+## 組み合わせのポイント
 
-- **Reactでは読み込みと破棄を明確にする**  
-  Unicorn StudioのSDKは `useEffect` の中で読み込み、アンマウント時に `scene.destroy()` を呼んでいます。ブログのプレビューやページ遷移で何度も表示される場合、WebGLリソースを残さないための処理です。
+- 背景、円形アクセント、ライン模様、ボケを別の役割として考える
+- 動きは強くしすぎず、背景全体が少し呼吸するくらいに抑える
+- 前面の `JUNK` はWebGLに描かず、通常のHTMLとして重ねる
+- 白いベールを挟んで、背景の強さと文字の読みやすさを調整する
 
-## 💡 使いどころとカスタマイズ
+## 実装のポイント
 
-- **最適なユースケース:**  
-  SaaSのファーストビュー、AI系サービスのLP、制作会社のキービジュアル、ポートフォリオの導入、プロダクト紹介ページの背景に向いています。  
-  反対に、長文記事の本文背景やフォーム周辺など、集中して読む・入力する場所には強すぎる場合があります。
-
-- **調整ダイヤル（パラメーター変更のヒント）:**
-  - `data-us-scale="0.65"` に変更すると、描画負荷が下がり、見た目も少し柔らかい印象になります。
-  - `data-us-dpi="1"` に変更すると、スマホや低スペック環境で安定しやすくなります。
-  - `data-us-fps="30"` に変更すると、滑らかさは少し落ちますが、背景演出としては十分な場合があります。
-  - `.glass-bokeh-veil` の白いグラデーションを強めると、コピーが読みやすくなります。
-  - `.hero-copy h1` の `max-width` を広げると、ビジュアル感よりも情報量のあるLP向きになります。
-  - `.glass-bokeh-shell` の `border-radius` を小さくすると、よりプロダクトUIっぽい硬い印象になります。
+1. `Component.jsx` はcanvasの初期化、リサイズ、マウス位置、描画ループだけを見る
+2. `createBokehProgram.js` はshader programを作る処理だけに分ける
+3. `fragmentShader.js` では背景色、円形アクセント、ライン、ボケ、grainをまとめて描く
+4. `styles.css` ではcanvas、ベール、文字の重なり順だけを整える
 
 ## まとめ
 
-この表現は、派手な操作演出ではなく、ページ全体の雰囲気を作るためのWebGL背景として使うのが合っています。淡いボケとガラス質の3Dを背景に置き、前面の情報はしっかり読ませる。LPやポートフォリオで「何か作り込まれている」と最初に感じてもらいたいときに使いやすい表現です。
+覚えておくのは、背景表現は作り込みより分担。WebGLは雰囲気、CSSは読みやすさ、HTMLは情報を担当する。そこを分けておくと、見た目の調整もしやすい。
