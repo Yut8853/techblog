@@ -150,10 +150,74 @@ function generateReactPreviewHTML(
   cssCode: string,
   baseOrigin: string
 ): string {
+  const usesReactThreeFiber = Object.values(codeFiles).some(source =>
+    source.includes('@react-three/fiber')
+  );
   const bundle = bundleReactFiles(codeFiles);
   const bundledCode = bundle?.bundledCode || defaultCode.jsx;
   const componentName = extractComponentName(bundle?.entryCode || defaultCode.jsx);
   const runtimeSource = `${bundledCode}\nconst root = ReactDOM.createRoot(document.getElementById('root'));\nroot.render(React.createElement(${componentName}));`;
+  const runtimeScript = usesReactThreeFiber
+    ? `
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.3.1",
+        "react-dom": "https://esm.sh/react-dom@18.3.1",
+        "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+        "three": "https://esm.sh/three@0.160.0",
+        "@react-three/fiber": "https://esm.sh/@react-three/fiber@8.17.10?external=react,react-dom,three"
+      }
+    }
+  </script>
+  <script type="module">
+    import React from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { Canvas, useFrame } from '@react-three/fiber';
+
+    window.React = React;
+    window.ReactDOM = { createRoot };
+    window.Canvas = Canvas;
+    window.useFrame = useFrame;
+
+    const source = ${JSON.stringify(runtimeSource)};
+    const transpiled = window.ts.transpileModule(source, {
+      compilerOptions: {
+        jsx: window.ts.JsxEmit.React,
+        target: window.ts.ScriptTarget.ES2019,
+        module: window.ts.ModuleKind.None,
+      },
+      fileName: 'preview.tsx',
+      reportDiagnostics: false,
+    }).outputText;
+
+    try {
+      window.eval(transpiled);
+    } catch (error) {
+      console.error(error);
+    }
+  </script>
+`
+    : `
+  <script>
+    const source = ${JSON.stringify(runtimeSource)};
+    const transpiled = window.ts.transpileModule(source, {
+      compilerOptions: {
+        jsx: window.ts.JsxEmit.React,
+        target: window.ts.ScriptTarget.ES2019,
+        module: window.ts.ModuleKind.None,
+      },
+      fileName: 'preview.tsx',
+      reportDiagnostics: false,
+    }).outputText;
+
+    try {
+      window.eval(transpiled);
+    } catch (error) {
+      console.error(error);
+    }
+  </script>
+`;
 
   return `
 <!DOCTYPE html>
@@ -178,24 +242,7 @@ function generateReactPreviewHTML(
 </head>
 <body>
   <div id="root"></div>
-  <script>
-    const source = ${JSON.stringify(runtimeSource)};
-    const transpiled = window.ts.transpileModule(source, {
-      compilerOptions: {
-        jsx: window.ts.JsxEmit.React,
-        target: window.ts.ScriptTarget.ES2019,
-        module: window.ts.ModuleKind.None,
-      },
-      fileName: 'preview.tsx',
-      reportDiagnostics: false,
-    }).outputText;
-
-    try {
-      window.eval(transpiled);
-    } catch (error) {
-      console.error(error);
-    }
-  </script>
+  ${runtimeScript}
 </body>
 </html>
 `;
