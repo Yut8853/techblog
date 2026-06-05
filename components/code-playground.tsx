@@ -157,6 +157,7 @@ function generateReactPreviewHTML(
   const bundledCode = bundle?.bundledCode || defaultCode.jsx;
   const componentName = extractComponentName(bundle?.entryCode || defaultCode.jsx);
   const runtimeSource = `${bundledCode}\nconst root = ReactDOM.createRoot(document.getElementById('root'));\nroot.render(React.createElement(${componentName}));`;
+  const moduleRuntimeSource = `const React = window.React;\nconst ReactDOM = window.ReactDOM;\nconst Canvas = window.Canvas;\nconst useFrame = window.useFrame;\n${runtimeSource}`;
   const runtimeScript = usesReactThreeFiber
     ? `
   <script type="importmap">
@@ -180,7 +181,7 @@ function generateReactPreviewHTML(
     window.Canvas = Canvas;
     window.useFrame = useFrame;
 
-    const source = ${JSON.stringify(runtimeSource)};
+    const source = ${JSON.stringify(moduleRuntimeSource)};
     const transpiled = window.ts.transpileModule(source, {
       compilerOptions: {
         jsx: window.ts.JsxEmit.React,

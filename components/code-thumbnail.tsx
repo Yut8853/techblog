@@ -143,6 +143,7 @@ function generateReactPreviewHTML(
     ? 'ThumbnailWrapper'
     : componentName;
   const runtimeSource = `${bundledCode}\n\n${loopWrapper}\n\nconst root = ReactDOM.createRoot(document.getElementById('root'));\nroot.render(React.createElement(${rootComponent}));`;
+  const moduleRuntimeSource = `const React = window.React;\nconst ReactDOM = window.ReactDOM;\nconst Canvas = window.Canvas;\nconst useFrame = window.useFrame;\n${runtimeSource}`;
   const runtimeScript = usesReactThreeFiber
     ? `
   <script type="importmap">
@@ -166,7 +167,7 @@ function generateReactPreviewHTML(
     window.Canvas = Canvas;
     window.useFrame = useFrame;
 
-    const source = ${JSON.stringify(runtimeSource)};
+    const source = ${JSON.stringify(moduleRuntimeSource)};
     const transpiled = window.ts.transpileModule(source, {
       compilerOptions: {
         jsx: window.ts.JsxEmit.React,
