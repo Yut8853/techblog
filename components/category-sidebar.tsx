@@ -76,9 +76,10 @@ export function CategorySidebar() {
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex gap-3">
-                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+                    <div className="aspect-video w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
                       <CodeThumbnail
                         code={article.code}
+                        files={article.files}
                         fallbackClass={article.thumbnail}
                       />
                     </div>

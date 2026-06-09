@@ -157,46 +157,68 @@ function generateReactPreviewHTML(
   const bundledCode = bundle?.bundledCode || defaultCode.jsx;
   const componentName = extractComponentName(bundle?.entryCode || defaultCode.jsx);
   const runtimeSource = `${bundledCode}\nconst root = ReactDOM.createRoot(document.getElementById('root'));\nroot.render(React.createElement(${componentName}));`;
-  const moduleRuntimeSource = `const React = window.React;\nconst ReactDOM = window.ReactDOM;\nconst Canvas = window.Canvas;\nconst useFrame = window.useFrame;\n${runtimeSource}`;
+  const r3fRuntimeSource = `import React from 'react';\nimport { createRoot } from 'react-dom/client';\nimport * as THREE from 'three';\nimport * as ReactThreeFiber from '@react-three/fiber';\nconst ReactDOM = { createRoot };\nconst { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } = React;\nconst { Canvas, createPortal, extend, useFrame, useGraph, useLoader, useThree } = ReactThreeFiber;\nconst { BoxGeometry, BufferAttribute, BufferGeometry, CanvasTexture, Color, Clock, DoubleSide, Float32BufferAttribute, Group, IcosahedronGeometry, MathUtils, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, SphereGeometry, TextureLoader, TorusKnotGeometry, Vector2, Vector3 } = THREE;\n${runtimeSource}`;
+  const reactRuntimeScripts = usesReactThreeFiber
+    ? ''
+    : `
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+`;
   const runtimeScript = usesReactThreeFiber
     ? `
   <script type="importmap">
     {
       "imports": {
         "react": "https://esm.sh/react@18.3.1",
+        "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
         "react-dom": "https://esm.sh/react-dom@18.3.1",
         "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+        "react-dom/server": "https://esm.sh/react-dom@18.3.1/server",
         "three": "https://esm.sh/three@0.160.0",
         "@react-three/fiber": "https://esm.sh/@react-three/fiber@8.17.10?external=react,react-dom,three"
       }
     }
   </script>
   <script type="module">
-    import React from 'react';
-    import { createRoot } from 'react-dom/client';
-    import { Canvas, useFrame } from '@react-three/fiber';
-
-    window.React = React;
-    window.ReactDOM = { createRoot };
-    window.Canvas = Canvas;
-    window.useFrame = useFrame;
-
-    const source = ${JSON.stringify(moduleRuntimeSource)};
-    const transpiled = window.ts.transpileModule(source, {
-      compilerOptions: {
-        jsx: window.ts.JsxEmit.React,
-        target: window.ts.ScriptTarget.ES2019,
-        module: window.ts.ModuleKind.None,
-      },
-      fileName: 'preview.tsx',
-      reportDiagnostics: false,
-    }).outputText;
-
-    try {
-      window.eval(transpiled);
-    } catch (error) {
+    function showPreviewError(error) {
       console.error(error);
+      const message = error instanceof Error ? error.message : String(error);
+      const root = document.getElementById('root');
+      root.innerHTML = '<div class="preview-error"></div>';
+      root.firstElementChild.textContent = message
+        ? 'R3F preview could not be loaded: ' + message
+        : 'R3F preview could not be loaded.';
     }
+
+    async function bootPreview() {
+      let moduleUrl;
+
+      try {
+        const source = ${JSON.stringify(r3fRuntimeSource)};
+        const transpiled = window.ts.transpileModule(source, {
+          compilerOptions: {
+            jsx: window.ts.JsxEmit.React,
+            target: window.ts.ScriptTarget.ES2020,
+            module: window.ts.ModuleKind.ES2020,
+          },
+          fileName: 'preview.tsx',
+          reportDiagnostics: false,
+        }).outputText;
+
+        moduleUrl = URL.createObjectURL(
+          new Blob([transpiled], { type: 'text/javascript' })
+        );
+        await import(moduleUrl);
+      } catch (error) {
+        showPreviewError(error);
+      } finally {
+        if (moduleUrl) {
+          URL.revokeObjectURL(moduleUrl);
+        }
+      }
+    }
+
+    bootPreview();
   </script>
 `
     : `
@@ -227,8 +249,7 @@ function generateReactPreviewHTML(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <base href="${baseOrigin}/">
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  ${reactRuntimeScripts}
   <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
   <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
@@ -238,6 +259,16 @@ function generateReactPreviewHTML(
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { min-height: 100%; }
     body { font-family: system-ui, -apple-system, sans-serif; }
+    .preview-error {
+      display: grid;
+      min-height: 100vh;
+      place-items: center;
+      padding: 24px;
+      color: rgba(255, 247, 237, 0.78);
+      background: #191716;
+      font: 600 14px/1.5 system-ui, sans-serif;
+      text-align: center;
+    }
     ${cssCode}
   </style>
 </head>
@@ -402,10 +433,10 @@ export function CodePlayground({ code, files }: CodePlaygroundProps) {
 
   return (
     <div className="space-y-4">
-      <div className="relative h-[clamp(460px,68vh,920px)] w-full overflow-hidden rounded-2xl border border-border bg-slate-900">
+      <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-slate-900">
         <iframe
           ref={iframeRef}
-          className="h-full w-full border-0"
+          className="block h-full w-full border-0"
           title="Code Preview"
           sandbox="allow-scripts allow-same-origin"
         />

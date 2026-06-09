@@ -297,7 +297,7 @@ export function ArticlesPageContent({
             </div>
 
             <div className="grid min-h-0 flex-1 gap-0 xl:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="min-h-[62vh] bg-slate-900 xl:min-h-[72vh]">
+              <div className="aspect-video self-start bg-slate-900">
                 <CodeThumbnail
                   code={previewArticle.code}
                   files={previewArticle.files}

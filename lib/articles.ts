@@ -181,7 +181,7 @@ function isArticleInCategory(article: Article, categoryName: string): boolean {
   );
 }
 
-const readArticles = cache((): Article[] => {
+function readArticlesFromDisk(): Article[] {
   const parsedArticles = getArticleFileNames().map(fileName => {
     const fullPath = path.join(articlesDirectory, fileName);
     const source = fs.readFileSync(fullPath, 'utf8');
@@ -243,10 +243,16 @@ const readArticles = cache((): Article[] => {
       ...article,
       id: index + 1,
     }));
-});
+}
+
+const readCachedArticles = cache(readArticlesFromDisk);
 
 export function getAllArticles(): Article[] {
-  return readArticles();
+  if (process.env.NODE_ENV === 'development') {
+    return readArticlesFromDisk();
+  }
+
+  return readCachedArticles();
 }
 
 // ============================================

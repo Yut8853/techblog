@@ -120,6 +120,7 @@ export default async function CategoryDetailPage({
                       <div className="aspect-video relative overflow-hidden bg-slate-900">
                         <CodeThumbnail
                           code={article.code}
+                          files={article.files}
                           fallbackClass={article.thumbnail}
                         />
                         <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded bg-black/50 text-sm font-medium text-white">
