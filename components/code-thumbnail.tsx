@@ -143,7 +143,6 @@ function generateReactPreviewHTML(
     ? 'ThumbnailWrapper'
     : componentName;
   const runtimeSource = `${bundledCode}\n\n${loopWrapper}\n\nconst root = ReactDOM.createRoot(document.getElementById('root'));\nroot.render(React.createElement(${rootComponent}));`;
-  const r3fRuntimeSource = `import React from 'react';\nimport { createRoot } from 'react-dom/client';\nimport * as THREE from 'three';\nimport * as ReactThreeFiber from '@react-three/fiber';\nconst ReactDOM = { createRoot };\nconst { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } = React;\nconst { Canvas, createPortal, extend, useFrame, useGraph, useLoader, useThree } = ReactThreeFiber;\nconst { BoxGeometry, BufferAttribute, BufferGeometry, CanvasTexture, Color, Clock, DoubleSide, Float32BufferAttribute, Group, IcosahedronGeometry, MathUtils, Mesh, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, Points, PointsMaterial, ShaderMaterial, SphereGeometry, TextureLoader, TorusKnotGeometry, Vector2, Vector3 } = THREE;\n${runtimeSource}`;
   const reactRuntimeScripts = usesReactThreeFiber
     ? ''
     : `
@@ -156,51 +155,43 @@ function generateReactPreviewHTML(
     {
       "imports": {
         "react": "https://esm.sh/react@18.3.1",
-        "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
         "react-dom": "https://esm.sh/react-dom@18.3.1",
         "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
-        "react-dom/server": "https://esm.sh/react-dom@18.3.1/server",
         "three": "https://esm.sh/three@0.160.0",
         "@react-three/fiber": "https://esm.sh/@react-three/fiber@8.17.10?external=react,react-dom,three"
       }
     }
   </script>
   <script type="module">
-    function showPreviewError(error) {
-      console.error(error);
-      const message = error instanceof Error ? error.message : String(error);
-      const root = document.getElementById('root');
-      root.innerHTML = '<div class="preview-error"></div>';
-      root.firstElementChild.textContent = message
-        ? 'R3F preview could not be loaded: ' + message
-        : 'R3F preview could not be loaded.';
-    }
-
     async function bootPreview() {
-      let moduleUrl;
-
       try {
-        const source = ${JSON.stringify(r3fRuntimeSource)};
+        const reactModule = await import('react');
+        const React = reactModule.default || reactModule;
+        const { createRoot } = await import('react-dom/client');
+        const { Canvas, useFrame } = await import('@react-three/fiber');
+        const ReactDOM = { createRoot };
+
+        window.React = React;
+        window.ReactDOM = ReactDOM;
+        window.Canvas = Canvas;
+        window.useFrame = useFrame;
+
+        const source = ${JSON.stringify(runtimeSource)};
         const transpiled = window.ts.transpileModule(source, {
           compilerOptions: {
             jsx: window.ts.JsxEmit.React,
-            target: window.ts.ScriptTarget.ES2020,
-            module: window.ts.ModuleKind.ES2020,
+            target: window.ts.ScriptTarget.ES2019,
+            module: window.ts.ModuleKind.None,
           },
           fileName: 'preview.tsx',
           reportDiagnostics: false,
         }).outputText;
 
-        moduleUrl = URL.createObjectURL(
-          new Blob([transpiled], { type: 'text/javascript' })
-        );
-        await import(moduleUrl);
+        eval(transpiled);
       } catch (error) {
-        showPreviewError(error);
-      } finally {
-        if (moduleUrl) {
-          URL.revokeObjectURL(moduleUrl);
-        }
+        console.error(error);
+        document.getElementById('root').innerHTML =
+          '<div class="preview-error">R3F preview could not be loaded.</div>';
       }
     }
 

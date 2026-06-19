@@ -211,28 +211,11 @@ files:
               </div>
             </div>
 
-            <nav className="archive-nav">
-              <div className="archive-nav-logo">
-                <a href="#">Archive</a>
-              </div>
-
-              <div className="archive-nav-links">
-                {navItems.map((item) => (
-                  <a href="#" key={item}>{item}</a>
-                ))}
-              </div>
-            </nav>
-
             <section className="archive-hero">
               <div className="archive-header">
-                <h1>Archive</h1>
+                <h1>JUNKBRANDING</h1>
               </div>
 
-              <div className="archive-hero-footer">
-                {footerWords.map((word) => (
-                  <p key={word}>{word}</p>
-                ))}
-              </div>
             </section>
           </section>
         )
