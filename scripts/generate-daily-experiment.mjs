@@ -6,7 +6,7 @@ const ROOT = process.cwd();
 const ARTICLES_DIR = path.join(ROOT, 'content', 'articles');
 const SERIES_START = '2026-10-03';
 const SERIES_LENGTH = 365;
-const MODEL = process.env.OPENAI_MODEL || 'gpt-6-astra';
+const MODEL = process.env.OPENAI_MODEL || 'gpt-5.1';
 const API_KEY = process.env.OPENAI_API_KEY;
 
 if (!API_KEY) {
