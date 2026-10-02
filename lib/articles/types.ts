@@ -23,6 +23,8 @@ export interface Article {
   title: string;
   description: string;
   category: string;
+  categorySlug: string;
+  categoryDescription: string;
   tags: string[];
   date: string;
   publishedAt: string;
