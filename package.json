@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build",
+    "build": "node ./scripts/validate-preview-runtime.mjs && next build",
     "start": "next start",
     "lint": "eslint .",
     "test": "node ./scripts/validate-content.mjs",
