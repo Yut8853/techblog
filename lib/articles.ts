@@ -5,7 +5,6 @@ import path from 'node:path';
 import { cache } from 'react';
 import matter from 'gray-matter';
 import { getThumbnailByCategory } from './config/thumbnails';
-import { categories, type Category } from './config/categories';
 import type {
   Article,
   ArticleCode,
@@ -29,6 +28,8 @@ interface ArticleFrontmatter {
   title?: string;
   description?: string;
   category?: string;
+  categorySlug?: string;
+  categoryDescription?: string;
   tags?: string[];
   date?: string;
   publishedAt?: string;
@@ -144,43 +145,6 @@ function getArticleFileNames(): string[] {
     );
 }
 
-function isArticleInCategory(article: Article, categoryName: string): boolean {
-  const categoryConfig = categories.find(
-    category => category.name === categoryName
-  );
-
-  if (article.category === categoryName) {
-    return true;
-  }
-
-  if (categoryConfig) {
-    if (
-      categoryConfig.keywords?.some(
-        keyword =>
-          article.category.includes(keyword) ||
-          keyword.includes(article.category)
-      )
-    ) {
-      return true;
-    }
-
-    if (
-      categoryConfig.subCategories.some(
-        subCategory =>
-          article.category.includes(subCategory.name) ||
-          subCategory.name.includes(article.category)
-      )
-    ) {
-      return true;
-    }
-  }
-
-  return (
-    article.category.includes(categoryName) ||
-    categoryName.includes(article.category)
-  );
-}
-
 function readArticlesFromDisk(): Article[] {
   const parsedArticles = getArticleFileNames().map(fileName => {
     const fullPath = path.join(articlesDirectory, fileName);
@@ -192,6 +156,8 @@ function readArticlesFromDisk(): Article[] {
     const title = normalizeTextValue(frontmatter.title);
     const description = normalizeTextValue(frontmatter.description);
     const category = normalizeTextValue(frontmatter.category);
+    const categorySlug = normalizeTextValue(frontmatter.categorySlug);
+    const categoryDescription = normalizeTextValue(frontmatter.categoryDescription);
     const date = normalizeTextValue(frontmatter.date);
     const publishedAt = normalizeTextValue(frontmatter.publishedAt);
     const readTime = normalizeTextValue(frontmatter.readTime);
@@ -210,6 +176,8 @@ function readArticlesFromDisk(): Article[] {
       !title ||
       !description ||
       !category ||
+      !categorySlug ||
+      !categoryDescription ||
       !date ||
       !publishedAt ||
       !readTime
@@ -223,6 +191,8 @@ function readArticlesFromDisk(): Article[] {
       title,
       description,
       category,
+      categorySlug,
+      categoryDescription,
       tags,
       date,
       publishedAt,
@@ -270,9 +240,81 @@ export function getArticleBySlug(slug: string): Article | undefined {
 // カテゴリーでフィルタリング（部分一致対応）
 export function getArticlesByCategory(category: string): Article[] {
   if (category === 'すべて') return getAllArticles();
-  return getAllArticles().filter(article =>
-    isArticleInCategory(article, category)
+  return getAllArticles().filter(article => article.category === category);
+}
+
+export function getArticlesByCategorySlug(categorySlug: string): Article[] {
+  return getAllArticles().filter(article => article.categorySlug === categorySlug);
+}
+
+export interface DynamicCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  articleCount: number;
+  subCategories: Array<{
+    name: string;
+    slug: string;
+    featured?: boolean;
+    articleCount: number;
+    active: boolean;
+  }>;
+}
+
+function toTagSlug(tag: string): string {
+  return encodeURIComponent(tag.toLowerCase().replace(/\s+/g, '-'));
+}
+
+export function getDynamicCategories(): DynamicCategory[] {
+  const categoryMap = new Map<string, DynamicCategory>();
+
+  for (const article of getAllArticles()) {
+    const current = categoryMap.get(article.categorySlug);
+
+    if (!current) {
+      categoryMap.set(article.categorySlug, {
+        id: article.categorySlug,
+        name: article.category,
+        slug: article.categorySlug,
+        description: article.categoryDescription,
+        icon: 'Box',
+        articleCount: 1,
+        subCategories: article.tags.map(tag => ({
+          name: tag,
+          slug: toTagSlug(tag),
+          articleCount: 1,
+          active: true,
+        })),
+      });
+      continue;
+    }
+
+    current.articleCount += 1;
+
+    for (const tag of article.tags) {
+      const existingTag = current.subCategories.find(item => item.name === tag);
+      if (existingTag) {
+        existingTag.articleCount += 1;
+      } else {
+        current.subCategories.push({
+          name: tag,
+          slug: toTagSlug(tag),
+          articleCount: 1,
+          active: true,
+        });
+      }
+    }
+  }
+
+  return [...categoryMap.values()].sort(
+    (left, right) => right.articleCount - left.articleCount || left.name.localeCompare(right.name)
   );
+}
+
+export function getDynamicCategoryBySlug(slug: string): DynamicCategory | undefined {
+  return getDynamicCategories().find(category => category.slug === slug);
 }
 
 // タグでフィルタリング
@@ -351,37 +393,9 @@ export function getAllUsedCategories(): string[] {
 
 // カテゴリー別の記事数を取得（カテゴリー設定と記事を照合）
 export function getArticleCountByCategory(categoryName: string): number {
-  return getAllArticles().filter(article =>
-    isArticleInCategory(article, categoryName)
-  ).length;
+  return getAllArticles().filter(article => article.category === categoryName).length;
 }
 
-// 全カテゴリーの記事数マップを取得
-export function getCategoryArticleCounts(): Map<string, number> {
-  const counts = new Map<string, number>();
-  getAllArticles().forEach(article => {
-    const current = counts.get(article.category) || 0;
-    counts.set(article.category, current + 1);
-  });
-  return counts;
-}
-
-export function getCategoryTotalCount(category: Category): number {
-  return getArticleCountByCategory(category.name);
-}
-
-export function getSubCategoryArticleCount(
-  category: Category,
-  subCategoryName: string
-): number {
-  return getAllArticles().filter(
-    article =>
-      isArticleInCategory(article, category.name) &&
-      article.tags.includes(subCategoryName)
-  ).length;
-}
-
-// 記事があるカテゴリーのみ取得
 export function getCategoriesWithArticles(): string[] {
-  return getAllUsedCategories();
+  return getDynamicCategories().map(category => category.name);
 }
