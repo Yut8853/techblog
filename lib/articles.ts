@@ -12,6 +12,7 @@ import type {
   ArticleLayout,
   ArticleThumbnail,
   ArticleViewer,
+  DynamicCategory,
 } from './articles/types';
 
 export type {
@@ -21,6 +22,7 @@ export type {
   ArticleLayout,
   ArticleThumbnail,
   ArticleViewer,
+  DynamicCategory,
 };
 
 interface ArticleFrontmatter {
@@ -246,22 +248,6 @@ export function getArticlesByCategory(category: string): Article[] {
 
 export function getArticlesByCategorySlug(categorySlug: string): Article[] {
   return getAllArticles().filter(article => article.categorySlug === categorySlug);
-}
-
-export interface DynamicCategory {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  icon: string;
-  articleCount: number;
-  subCategories: Array<{
-    name: string;
-    slug: string;
-    featured?: boolean;
-    articleCount: number;
-    active: boolean;
-  }>;
 }
 
 function toTagSlug(tag: string): string {
