@@ -19,6 +19,9 @@ for (const file of files) {
   const day = Number(data.day || 0);
   const categorySlug = String(data.categorySlug || '');
   const categoryDescription = String(data.categoryDescription || '');
+  const referenceTitle = String(data.referenceTitle || '');
+  const referenceUrl = String(data.referenceUrl || '');
+  const qualityScore = Number(data.qualityScore || 0);
   const articleFiles = Array.isArray(data.files) ? data.files : [];
 
   if (data.dailyLab !== true) {
@@ -31,6 +34,18 @@ for (const file of files) {
 
   if (!categoryDescription.trim()) {
     errors.push(`${file}: categoryDescription is required`);
+  }
+
+  if (!referenceTitle.trim()) {
+    errors.push(`${file}: referenceTitle is required`);
+  }
+
+  if (!/^https:\/\//.test(referenceUrl)) {
+    errors.push(`${file}: referenceUrl must be https URL`);
+  }
+
+  if (!Number.isFinite(qualityScore) || qualityScore < 80) {
+    errors.push(`${file}: qualityScore must be 80 or higher`);
   }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(publishedAt)) {
@@ -68,6 +83,10 @@ for (const file of files) {
     }
     if (!String(entry.content || '').trim()) {
       errors.push(`${file}: ${name} is empty`);
+    }
+
+    if (name === 'experiment.js' && String(entry.content || '').length < 2500) {
+      errors.push(`${file}: experiment.js is too small for production-grade study`);
     }
   }
 
