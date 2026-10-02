@@ -83,6 +83,8 @@ function readHistory() {
         title: parsed.data.title || '',
         description: parsed.data.description || '',
         focus: parsed.data.focus || '',
+        category: parsed.data.category || '',
+        categorySlug: parsed.data.categorySlug || '',
         day: Number(parsed.data.day || 0),
         publishedAt: String(parsed.data.publishedAt || ''),
       };
