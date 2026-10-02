@@ -5,20 +5,22 @@
 ## 毎日の流れ
 
 1. GitHub Actions が毎日 07:00 JST を狙って起動
-2. OpenAI API がその日のテーマ、記事本文、HTML/CSS/JavaScriptを生成
-3. 既存のDaily Lab記事履歴を読み、重複を避ける
-4. コンテンツ検証
-5. Daily Lab専用検証
-6. Next.js production build
-7. すべて成功した場合のみ main にcommit/push
-8. Vercelがmainの更新を検知して自動デプロイ
+2. OpenAI API のWeb Searchで Awwwards / CSS Design Awards から参考事例を1件調査
+3. 参考サイトのブランドや素材をコピーせず、インタラクション原理とモーション設計を抽出
+4. AIが実務品質のHTML/CSS/JavaScriptデモと記事を生成
+5. 別のAIレビューで visual / interaction / technical / production readiness を採点
+6. 84点未満なら最大2回まで自動で作り直す
+7. コンテンツ検証 + Daily Lab専用検証 + Next.js production build
+8. すべて成功した場合のみ main にcommit/push
+9. Vercelがmainの更新を検知して自動デプロイ
 
 ## 事前設定
 
 GitHub repository settings で次を追加してください。
 
 - Actions secret: `OPENAI_API_KEY`
-- Actions variable: `OPENAI_MODEL`（任意。未設定時は `gpt-5.1`）
+- Actions variable: `OPENAI_MODEL`（任意。未設定時は `gpt-6-astra`）
+- Actions variable: `OPENAI_RESEARCH_MODEL`（任意。参考サイト調査専用モデル）
 
 Vercel側では、このGitHubリポジトリの `main` ブランチをProductionに接続してください。
 
@@ -72,7 +74,9 @@ playground上で直接編集し、Runで再実行できます。
 3. WebGL
 4. WebGPU
 
-さらに particles / noise / distortion / ray marching / post processing / SDF / interaction など20系統の表現テーマを循環させ、AIが過去記事を参照して具体的な実験内容を変えます。
+さらに slider / drag distortion / scroll-driven reveal / kinetic typography / particles / post processing / 3D product showcase などを循環します。
+
+各日、Awwwards / CSS Design Awardsからそのテーマに近い実在の受賞・掲載事例を検索し、参考URLを記事に明記します。コピーではなく、インタラクション原理・モーション設計・シェーダー技法を抽出してオリジナル実装へ再構成します。
 
 ## 公開リセット
 
