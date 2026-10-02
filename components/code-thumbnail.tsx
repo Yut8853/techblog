@@ -227,6 +227,14 @@ function generateReactPreviewHTML(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <base href="${baseOrigin}/">
   ${reactRuntimeScripts}
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://esm.sh/three@0.180.0",
+        "three/": "https://esm.sh/three@0.180.0/"
+      }
+    }
+  </script>
   <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
   <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
@@ -282,7 +290,18 @@ function generateHtmlPreviewHTML(
 <body>
   ${htmlCode}
   <script>
-    ${jsCode}
+    window.addEventListener('error', event => {
+      console.error(event.error || event.message);
+      document.documentElement.dataset.previewError = 'true';
+    });
+
+    window.addEventListener('unhandledrejection', event => {
+      console.error(event.reason);
+      document.documentElement.dataset.previewError = 'true';
+    });
+  </script>
+  <script type="module">
+${jsCode}
   </script>
   ${getPlaybackScript(mode)}
 </body>
