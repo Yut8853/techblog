@@ -20,7 +20,8 @@ jobs:
 
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.1' }}
+      OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-6-astra' }}
+      OPENAI_RESEARCH_MODEL: ${{ vars.OPENAI_RESEARCH_MODEL || vars.OPENAI_MODEL || 'gpt-6-astra' }}
 
     steps:
       - name: Checkout
@@ -39,6 +40,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Check generator syntax
+        run: node --check scripts/generate-daily-experiment.mjs
 
       - name: Generate today's experiment
         run: node scripts/generate-daily-experiment.mjs
