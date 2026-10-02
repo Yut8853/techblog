@@ -284,6 +284,14 @@ function generateHtmlPreviewHTML(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <base href="${baseOrigin}/">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://esm.sh/three@0.180.0",
+        "three/": "https://esm.sh/three@0.180.0/"
+      }
+    }
+  </script>
   <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
   <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
@@ -292,13 +300,33 @@ function generateHtmlPreviewHTML(
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { min-height: 100%; }
     body { font-family: system-ui, -apple-system, sans-serif; }
+    .preview-error {
+      display: grid;
+      min-height: 100vh;
+      place-items: center;
+      padding: 24px;
+      color: rgba(255, 247, 237, 0.78);
+      background: #191716;
+      font: 600 14px/1.5 system-ui, sans-serif;
+      text-align: center;
+    }
     ${cssCode}
   </style>
 </head>
 <body>
   ${htmlCode}
-  <script>
-    ${jsCode}
+  <script type="module">
+    window.addEventListener('error', event => {
+      console.error(event.error || event.message);
+    });
+
+    try {
+      ${jsCode}
+    } catch (error) {
+      console.error(error);
+      document.body.innerHTML =
+        '<div class="preview-error">Experiment could not be loaded.</div>';
+    }
   </script>
 </body>
 </html>
