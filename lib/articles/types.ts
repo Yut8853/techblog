@@ -25,6 +25,10 @@ export interface Article {
   category: string;
   categorySlug: string;
   categoryDescription: string;
+  referenceTitle?: string;
+  referenceUrl?: string;
+  referencePlatform?: string;
+  qualityScore?: number;
   tags: string[];
   date: string;
   publishedAt: string;

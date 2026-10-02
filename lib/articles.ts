@@ -32,6 +32,10 @@ interface ArticleFrontmatter {
   category?: string;
   categorySlug?: string;
   categoryDescription?: string;
+  referenceTitle?: string;
+  referenceUrl?: string;
+  referencePlatform?: string;
+  qualityScore?: number;
   tags?: string[];
   date?: string;
   publishedAt?: string;
@@ -163,6 +167,13 @@ function readArticlesFromDisk(): Article[] {
     const categoryDescription =
       normalizeTextValue(frontmatter.categoryDescription) ||
       `${category || 'Web表現'}に関する実装記事です。`;
+    const referenceTitle = normalizeTextValue(frontmatter.referenceTitle);
+    const referenceUrl = normalizeTextValue(frontmatter.referenceUrl);
+    const referencePlatform = normalizeTextValue(frontmatter.referencePlatform);
+    const qualityScore =
+      typeof frontmatter.qualityScore === 'number'
+        ? frontmatter.qualityScore
+        : undefined;
     const date = normalizeTextValue(frontmatter.date);
     const publishedAt = normalizeTextValue(frontmatter.publishedAt);
     const readTime = normalizeTextValue(frontmatter.readTime);
@@ -196,6 +207,10 @@ function readArticlesFromDisk(): Article[] {
       category,
       categorySlug,
       categoryDescription,
+      referenceTitle,
+      referenceUrl,
+      referencePlatform,
+      qualityScore,
       tags,
       date,
       publishedAt,
