@@ -4,22 +4,14 @@ import { CodeThumbnail } from '@/components/code-thumbnail';
 import { Button } from '@/components/ui/button';
 import { Github, Dribbble, Sparkles, ChevronRight } from 'lucide-react';
 import { XIcon } from '@/components/x-icon';
-import { getPopularArticles, getArticleCountByCategory } from '@/lib/articles';
-import { categories } from '@/lib/config/categories';
+import { getPopularArticles, getDynamicCategories } from '@/lib/articles';
 import { siteConfig } from '@/lib/config/site';
 
 export function CategorySidebar() {
   const popularArticles = getPopularArticles(5);
   const { author, operator } = siteConfig;
 
-  // 記事があるカテゴリーのみ表示（記事数でソート）
-  const categoriesWithCounts = categories
-    .map(cat => ({
-      ...cat,
-      articleCount: getArticleCountByCategory(cat.name),
-    }))
-    .filter(cat => cat.articleCount > 0 || cat.popular)
-    .slice(0, 6);
+  const categoriesWithCounts = getDynamicCategories().slice(0, 6);
 
   return (
     <aside className="space-y-8">
