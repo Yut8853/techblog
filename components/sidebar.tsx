@@ -5,8 +5,7 @@ import { CodeThumbnail } from '@/components/code-thumbnail';
 import { Button } from '@/components/ui/button';
 import { Github, Dribbble } from 'lucide-react';
 import { XIcon } from '@/components/x-icon';
-import { getPopularArticles, getArticleCountByCategory } from '@/lib/articles';
-import { categories } from '@/lib/config/categories';
+import { getPopularArticles, getDynamicCategories } from '@/lib/articles';
 import { siteConfig } from '@/lib/config/site';
 
 interface SidebarProps {
@@ -19,13 +18,7 @@ export function Sidebar({ excludeSlugs = [] }: SidebarProps) {
     .slice(0, 5);
   const { author, operator } = siteConfig;
 
-  // 記事数でカテゴリーを拡張
-  const categoriesWithCounts = categories
-    .map(cat => ({
-      ...cat,
-      articleCount: getArticleCountByCategory(cat.name),
-    }))
-    .slice(0, 10);
+  const categoriesWithCounts = getDynamicCategories().slice(0, 10);
 
   return (
     <aside className="space-y-8">
