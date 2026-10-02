@@ -83,6 +83,8 @@ function readHistory() {
         title: parsed.data.title || '',
         description: parsed.data.description || '',
         focus: parsed.data.focus || '',
+        category: parsed.data.category || '',
+        categorySlug: parsed.data.categorySlug || '',
         day: Number(parsed.data.day || 0),
         publishedAt: String(parsed.data.publishedAt || ''),
       };
@@ -186,6 +188,9 @@ async function generateArticle({ today, dayNumber, focus, technique, history }) 
       'slug',
       'title',
       'description',
+      'category_name',
+      'category_slug',
+      'category_description',
       'tags',
       'concept',
       'html',
@@ -200,6 +205,193 @@ async function generateArticle({ today, dayNumber, focus, technique, history }) 
       },
       title: { type: 'string' },
       description: { type: 'string' },
+      category_name: { type: 'string' },
+      category_slug: {
+        type: 'string',
+        pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*
+        type: 'array',
+        minItems: 2,
+        maxItems: 5,
+        items: { type: 'string' },
+      },
+      concept: { type: 'string' },
+      html: { type: 'string' },
+      css: { type: 'string' },
+      javascript: { type: 'string' },
+      body_markdown: { type: 'string' },
+    },
+  };
+
+  const instructions = [
+    'あなたはWebグラフィックス専門のシニアクリエイティブデベロッパーです。',
+    '365日続くDaily Web Graphics Labの記事と、実際にブラウザで動くデモを1本生成してください。',
+    '出力は指定JSON Schemaに厳密に従ってください。',
+    '',
+    '重要ルール:',
+    '- 日本語で執筆する。',
+    '- 1記事1テーマ。見せ場を1つに絞る。',
+    '- category_name / category_slug / category_description も、その日の主役表現から自動生成する。',
+    '- category_nameは技術名だけではなく「WebGPUスライダー」「GLSLディストーション」「Three.jsパーティクル」のように技術×表現で具体化する。',
+    '- 既存履歴に同種カテゴリーがある場合は同じcategory_slugを再利用し、近い記事をまとめる。',
+    '- 毎回、前回までと視覚表現・アルゴリズム・インタラクションのうち最低2点を変える。',
+    '- デモは画像や動画など外部素材に依存せず、原則としてプロシージャル生成する。',
+    '- HTMLには必ず class="daily-stage" のルート要素を1つ置く。',
+    '- JavaScriptはES moduleとして実行される。',
+    '- Three.js利用時のimportは "three" または "three/..." のみ。',
+    '- WebGPUを扱う場合は navigator.gpu 非対応ブラウザ向けの説明表示を必ず用意する。',
+    '- requestAnimationFrameやイベントリスナーを使う場合は pagehide で停止・解除するcleanupを実装する。',
+    '- CSSはレスポンシブ対応し、canvasはコンテナからはみ出さない。',
+    '- fetch、WebSocket、localStorage、cookie、eval、新しいFunctionは禁止。',
+    '- 誇張した性能主張や未検証のベンチマークを書かない。',
+    '- 記事本文は「今回の表現」「仕組み」「コードの要点」「調整ポイント」「パフォーマンスと後片付け」「次に試せる発展」を含める。',
+    '- body_markdownにはfrontmatterを書かない。',
+    '- slugは英小文字とハイフンのみ。',
+  ].join('\n');
+
+  const prompt = [
+    `公開日: ${today.iso}`,
+    `Day: ${String(dayNumber).padStart(3, '0')} / 365`,
+    `主軸技術: ${focus}`,
+    `今回の表現系統: ${technique}`,
+    '',
+    '直近の公開履歴:',
+    JSON.stringify(recentHistory, null, 2),
+    '',
+    '上記履歴と重複を避け、実際に触って面白い1デモを企画・実装してください。',
+    '単なる回転する立方体や色が変わるだけの初歩例は避けてください。',
+    'ただし複雑さのための複雑さにはせず、記事1本で理解できる最小構成にしてください。',
+  ].join('\n');
+
+  const response = await fetch('https://api.openai.com/v1/responses', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      instructions,
+      input: prompt,
+      text: {
+        format: {
+          type: 'json_schema',
+          name: 'daily_web_graphics_experiment',
+          strict: true,
+          schema,
+        },
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`OpenAI API error ${response.status}: ${body}`);
+  }
+
+  const json = await response.json();
+  return JSON.parse(outputText(json));
+}
+
+function renderMarkdown(article, meta) {
+  const tags = uniqueTags(article.tags, meta.focus);
+
+  return `---
+title: ${yamlString(article.title)}
+description: ${yamlString(article.description)}
+category: ${yamlString(article.category_name)}
+categorySlug: ${yamlString(article.category_slug)}
+categoryDescription: ${yamlString(article.category_description)}
+tags:
+${tags.map(tag => `  - ${yamlString(tag)}`).join('\n')}
+date: ${yamlString(japaneseDate(meta.today))}
+publishedAt: ${meta.today.iso}
+readTime: ${yamlString('7分')}
+viewer: playground
+thumbnail: runtime
+layout: tutorial
+dailyLab: true
+day: ${meta.dayNumber}
+focus: ${yamlString(meta.focus)}
+concept: ${yamlString(article.concept)}
+files:
+  - name: index.html
+    language: html
+    content: |
+${block(article.html, 6)}
+  - name: styles.css
+    language: css
+    content: |
+${block(article.css, 6)}
+  - name: experiment.js
+    language: javascript
+    content: |
+${block(article.javascript, 6)}
+---
+
+# Day ${String(meta.dayNumber).padStart(3, '0')} — ${article.title}
+
+> 主軸: **${meta.focus}** / テーマ: **${meta.technique}**
+
+${article.body_markdown.trim()}
+`;
+}
+
+const today = tokyoDateParts();
+const dayNumber = daysBetween(SERIES_START, today.iso) + 1;
+
+if (dayNumber < 1) {
+  console.log(`Series has not started yet. Start date: ${SERIES_START}`);
+  process.exit(0);
+}
+
+if (dayNumber > SERIES_LENGTH) {
+  console.log('The 365-day series is complete.');
+  process.exit(0);
+}
+
+const existingToday = fs.existsSync(ARTICLES_DIR)
+  ? fs.readdirSync(ARTICLES_DIR).find(name => name.startsWith(`daily-${today.iso}-`))
+  : null;
+
+if (existingToday) {
+  console.log(`Today's article already exists: ${existingToday}`);
+  process.exit(0);
+}
+
+const history = readHistory();
+const focus = FOCUS_ROTATION[(dayNumber - 1) % FOCUS_ROTATION.length];
+const technique = TECHNIQUE_ROTATION[(dayNumber - 1) % TECHNIQUE_ROTATION.length];
+
+const article = await generateArticle({
+  today,
+  dayNumber,
+  focus,
+  technique,
+  history,
+});
+
+ensureSafeExperiment(article);
+
+fs.mkdirSync(ARTICLES_DIR, { recursive: true });
+
+const filename = `daily-${today.iso}-${article.slug}.md`;
+const outputPath = path.join(ARTICLES_DIR, filename);
+
+fs.writeFileSync(
+  outputPath,
+  renderMarkdown(article, {
+    today,
+    dayNumber,
+    focus,
+    technique,
+  }),
+  'utf8'
+);
+
+console.log(`Generated Day ${dayNumber}: ${outputPath}`);
+,
+      },
+      category_description: { type: 'string' },
       tags: {
         type: 'array',
         minItems: 2,

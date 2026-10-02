@@ -6,11 +6,9 @@ import { CategorySidebar } from '@/components/category-sidebar';
 import { CodeThumbnail } from '@/components/code-thumbnail';
 import { Badge } from '@/components/ui/badge';
 import { Home, ChevronRight, Calendar, Clock } from 'lucide-react';
-import { getCategoryBySlug } from '@/lib/config/categories';
 import {
-  getArticlesByCategory,
-  getCategoryTotalCount,
-  getSubCategoryArticleCount,
+  getArticlesByCategorySlug,
+  getDynamicCategoryBySlug,
 } from '@/lib/articles';
 
 export default async function CategoryDetailPage({
@@ -19,14 +17,14 @@ export default async function CategoryDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const category = getDynamicCategoryBySlug(slug);
 
   if (!category) {
     notFound();
   }
 
-  const articles = getArticlesByCategory(category.name);
-  const totalCount = getCategoryTotalCount(category);
+  const articles = getArticlesByCategorySlug(category.slug);
+  const totalCount = category.articleCount;
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,7 +66,7 @@ export default async function CategoryDetailPage({
               <h2 className="font-bold">サブカテゴリ</h2>
               <div className="mt-4 flex flex-wrap gap-2">
                 {category.subCategories.map(sub => {
-                  const count = getSubCategoryArticleCount(category, sub.name);
+                  const count = sub.articleCount;
 
                   if (count === 0) {
                     return (

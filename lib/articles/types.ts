@@ -23,6 +23,8 @@ export interface Article {
   title: string;
   description: string;
   category: string;
+  categorySlug: string;
+  categoryDescription: string;
   tags: string[];
   date: string;
   publishedAt: string;
@@ -34,4 +36,23 @@ export interface Article {
   files: ArticleFile[];
   content?: string;
   code?: ArticleCode;
+}
+
+
+export interface DynamicCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  articleCount: number;
+  popular?: boolean;
+  keywords?: string[];
+  subCategories: Array<{
+    name: string;
+    slug: string;
+    featured?: boolean;
+    articleCount: number;
+    active: boolean;
+  }>;
 }
