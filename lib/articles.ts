@@ -237,7 +237,10 @@ function readArticlesFromDisk(): Article[] {
     } satisfies Article;
   });
 
+  const seriesStart = process.env.NEXT_PUBLIC_DAILY_LAB_START || '2026-10-03';
+
   return parsedArticles
+    .filter(article => article.publishedAt >= seriesStart)
     .sort((left, right) => right.publishedAt.localeCompare(left.publishedAt))
     .map((article, index) => ({
       ...article,
