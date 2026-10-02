@@ -185,7 +185,7 @@ files:
             <div>
               <nav>
                 <div className="nav-logo">
-                  <a href="#">JUNK BRANDING</a>
+                  <a href="#">JUNKBRANDING</a>
                 </div>
 
                 <div className="nav-items">
@@ -605,7 +605,7 @@ code:
           <div>
             <nav>
               <div className="nav-logo">
-                <a href="#">JUNK BRANDING</a>
+                <a href="#">JUNKBRANDING</a>
               </div>
 
               <div className="nav-items">

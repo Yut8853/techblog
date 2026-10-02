@@ -6,7 +6,7 @@ export const siteConfig = {
     'クリエイティブな表現とテクノロジーの可能性を探求するブログです。アニメーションやインタラクションの実装方法を発信しています。',
   url: 'https://creative-dev-blog.vercel.app',
   operator: {
-    name: 'JUNK BRANDING',
+    name: 'JUNKBRANDING',
     url: 'https://junkbranding.com',
   },
   contact: {
