@@ -31,5 +31,8 @@ jobs:
       - name: Validate article content
         run: pnpm test:content
 
+      - name: Validate WebGL preview runtime
+        run: pnpm test:preview
+
       - name: Production build
         run: pnpm build
