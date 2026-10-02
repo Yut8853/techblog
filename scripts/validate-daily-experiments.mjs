@@ -17,10 +17,20 @@ for (const file of files) {
 
   const publishedAt = String(data.publishedAt || '');
   const day = Number(data.day || 0);
+  const categorySlug = String(data.categorySlug || '');
+  const categoryDescription = String(data.categoryDescription || '');
   const articleFiles = Array.isArray(data.files) ? data.files : [];
 
   if (data.dailyLab !== true) {
     errors.push(`${file}: dailyLab must be true`);
+  }
+
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(categorySlug)) {
+    errors.push(`${file}: categorySlug must be lowercase kebab-case`);
+  }
+
+  if (!categoryDescription.trim()) {
+    errors.push(`${file}: categoryDescription is required`);
   }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(publishedAt)) {
