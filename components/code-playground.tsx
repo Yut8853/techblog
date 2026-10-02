@@ -315,18 +315,19 @@ function generateHtmlPreviewHTML(
 </head>
 <body>
   ${htmlCode}
-  <script type="module">
+  <script>
     window.addEventListener('error', event => {
       console.error(event.error || event.message);
+      document.documentElement.dataset.previewError = 'true';
     });
 
-    try {
-      ${jsCode}
-    } catch (error) {
-      console.error(error);
-      document.body.innerHTML =
-        '<div class="preview-error">Experiment could not be loaded.</div>';
-    }
+    window.addEventListener('unhandledrejection', event => {
+      console.error(event.reason);
+      document.documentElement.dataset.previewError = 'true';
+    });
+  </script>
+  <script type="module">
+${jsCode}
   </script>
 </body>
 </html>
