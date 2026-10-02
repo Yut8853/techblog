@@ -156,8 +156,11 @@ function readArticlesFromDisk(): Article[] {
     const title = normalizeTextValue(frontmatter.title);
     const description = normalizeTextValue(frontmatter.description);
     const category = normalizeTextValue(frontmatter.category);
-    const categorySlug = normalizeTextValue(frontmatter.categorySlug);
-    const categoryDescription = normalizeTextValue(frontmatter.categoryDescription);
+    const categorySlug =
+      normalizeTextValue(frontmatter.categorySlug) || `legacy-${fileSlug}`;
+    const categoryDescription =
+      normalizeTextValue(frontmatter.categoryDescription) ||
+      `${category || 'Web表現'}に関する実装記事です。`;
     const date = normalizeTextValue(frontmatter.date);
     const publishedAt = normalizeTextValue(frontmatter.publishedAt);
     const readTime = normalizeTextValue(frontmatter.readTime);
@@ -176,8 +179,6 @@ function readArticlesFromDisk(): Article[] {
       !title ||
       !description ||
       !category ||
-      !categorySlug ||
-      !categoryDescription ||
       !date ||
       !publishedAt ||
       !readTime
