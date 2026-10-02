@@ -18,7 +18,7 @@
 GitHub repository settings で次を追加してください。
 
 - Actions secret: `OPENAI_API_KEY`
-- Actions variable: `OPENAI_MODEL`（任意。未設定時は `gpt-6-astra`）
+- Actions variable: `OPENAI_MODEL`（任意。未設定時は `gpt-5.1`）
 
 Vercel側では、このGitHubリポジトリの `main` ブランチをProductionに接続してください。
 
