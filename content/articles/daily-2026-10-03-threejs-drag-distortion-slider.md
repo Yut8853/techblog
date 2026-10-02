@@ -271,6 +271,10 @@ files:
         border-color: rgba(242,239,233,.38);
       }
 
+      .fallback-message[hidden] {
+        display: none !important;
+      }
+
       .fallback-message {
         position: absolute;
         inset: 0;

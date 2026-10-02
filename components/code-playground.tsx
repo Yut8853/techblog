@@ -248,6 +248,7 @@ function generateReactPreviewHTML(
   <script src="https://unpkg.com/typescript@5/lib/typescript.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    [hidden] { display: none !important; }
     html, body { min-height: 100%; }
     body { font-family: system-ui, -apple-system, sans-serif; }
     .preview-error {

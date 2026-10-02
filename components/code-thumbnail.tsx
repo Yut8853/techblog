@@ -26,6 +26,7 @@ function getPreviewShellStyles(mode: PreviewMode): string {
   if (mode === 'player') {
     return `
       * { margin: 0; padding: 0; box-sizing: border-box; }
+      [hidden] { display: none !important; }
       html, body { min-height: 100%; }
       body {
         font-family: system-ui, -apple-system, sans-serif;
@@ -39,6 +40,7 @@ function getPreviewShellStyles(mode: PreviewMode): string {
 
   return `
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    [hidden] { display: none !important; }
     html, body {
       width: 100%;
       height: 100%;
