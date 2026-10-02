@@ -17,19 +17,11 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { Category } from '@/lib/config/categories';
+import type { DynamicCategory } from '@/lib/articles';
 
 type FilterType = 'all' | 'popular' | 'new' | 'recommended';
 
-interface CategoryCard extends Category {
-  articleCount: number;
-  subCategories: Array<
-    Category['subCategories'][number] & {
-      articleCount: number;
-      active: boolean;
-    }
-  >;
-}
+type CategoryCard = DynamicCategory;
 
 interface CategoriesPageContentProps {
   categories: CategoryCard[];
