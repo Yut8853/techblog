@@ -4,30 +4,14 @@ import { Footer } from '@/components/footer';
 import { CategorySidebar } from '@/components/category-sidebar';
 import { Home, ChevronRight } from 'lucide-react';
 import { CategoriesPageContent } from '@/components/categories-page-content';
-import { categories } from '@/lib/config/categories';
 import {
   getAllUsedTags,
-  getCategoryTotalCount,
-  getSubCategoryArticleCount,
+  getDynamicCategories,
 } from '@/lib/articles';
 
 export default function CategoriesPage() {
   const usedTags = getAllUsedTags();
-  const categoryCards = categories.map(category => ({
-    ...category,
-    articleCount: getCategoryTotalCount(category),
-    subCategories: category.subCategories.map(subCategory => {
-      const articleCount = getSubCategoryArticleCount(
-        category,
-        subCategory.name
-      );
-      return {
-        ...subCategory,
-        articleCount,
-        active: articleCount > 0,
-      };
-    }),
-  }));
+  const categoryCards = getDynamicCategories();
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,7 +40,7 @@ export default function CategoriesPage() {
             <CategoriesPageContent
               categories={categoryCards}
               usedTags={usedTags}
-              totalCategoryCount={categories.length}
+              totalCategoryCount={categoryCards.length}
             />
           </div>
 
