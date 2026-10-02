@@ -37,3 +37,22 @@ export interface Article {
   content?: string;
   code?: ArticleCode;
 }
+
+
+export interface DynamicCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  articleCount: number;
+  popular?: boolean;
+  keywords?: string[];
+  subCategories: Array<{
+    name: string;
+    slug: string;
+    featured?: boolean;
+    articleCount: number;
+    active: boolean;
+  }>;
+}
