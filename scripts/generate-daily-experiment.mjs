@@ -316,6 +316,7 @@ async function generateArticle({
     '- pointer / wheel / drag / scroll / keyboardのうち、その表現に適した操作を最低1つ実装すること。',
     '- requestAnimationFrame、イベント、GPU/Three.jsリソースは必ずcleanupすること。',
     '- devicePixelRatio上限、resize、reduced-motionまたは非対応環境へのフォールバックを考慮すること。',
+    '- fallback要素にhidden属性を使う場合、CSSで[hidden] { display: none !important; }を必ず保証し、通常時に誤表示しないこと。',
     '- 実務で調整するパラメータがコードから分かること。',
     '- 外部ブランド名、ロゴ、原文コピー、受賞サイト固有の画像・動画・3Dモデルは使用しないこと。',
     '- 参考元と同一レイアウトをピクセル単位でコピーしないこと。',
