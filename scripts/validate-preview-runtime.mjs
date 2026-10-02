@@ -22,6 +22,10 @@ function assertRuntimeFile(filePath) {
     errors.push(`${path.relative(root, filePath)}: ES module script runtime is missing`);
   }
 
+  if (!source.includes('[hidden] { display: none !important; }')) {
+    errors.push(`${path.relative(root, filePath)}: hidden elements can be accidentally forced visible`);
+  }
+
   if (/try\s*\{\s*\$\{jsCode\}/s.test(source)) {
     errors.push(`${path.relative(root, filePath)}: jsCode is still wrapped inside try{}, which breaks static imports`);
   }
