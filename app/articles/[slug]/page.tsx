@@ -10,7 +10,7 @@ import { ExpressionTypes } from '@/components/expression-types';
 import { RelatedArticles } from '@/components/related-articles';
 import { ArticleHeader } from '@/components/article-header';
 import { Badge } from '@/components/ui/badge';
-import { ChevronRight, Home } from 'lucide-react';
+import { ChevronRight, ExternalLink, Home } from 'lucide-react';
 import { getArticleBySlug } from '@/lib/articles';
 
 export default async function ArticleDetailPage({
@@ -66,6 +66,35 @@ export default async function ArticleDetailPage({
               readTime={article.readTime}
               slug={article.slug}
             />
+
+            {article.referenceUrl && article.referenceTitle && (
+              <section className="mt-8 rounded-xl border border-border bg-card p-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                      Reference / 参考元
+                    </p>
+                    <p className="mt-1 font-semibold text-foreground">
+                      {article.referenceTitle}
+                    </p>
+                    {article.referencePlatform && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {article.referencePlatform}
+                      </p>
+                    )}
+                  </div>
+                  <a
+                    href={article.referenceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 self-start rounded-lg border border-border px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-muted"
+                  >
+                    参考サイトを見る
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+              </section>
+            )}
 
             {/* Code Playground */}
             {(article.code || article.files.length > 0) && (
