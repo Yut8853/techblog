@@ -110,7 +110,6 @@ files:
             <section className="stacked-stage">
               <div className="stage-copy">
                 <span className="stage-kicker">Feature Panels</span>
-                <h2>縦スクロールの移動量を、そのまま視線誘導に変える</h2>
               </div>
 
               <div className="stacked-cards">
@@ -406,7 +405,6 @@ code:
           <section className="stacked-stage">
             <div className="stage-copy">
               <span className="stage-kicker">Feature Panels</span>
-              <h2>縦スクロールの移動量を、そのまま視線誘導に変える</h2>
             </div>
 
             <div className="stacked-cards">

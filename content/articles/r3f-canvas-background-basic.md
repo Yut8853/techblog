@@ -72,7 +72,6 @@ files:
 
             <div className="r3f-content">
               <p className="r3f-label">R3F BACKGROUND</p>
-              <h1>Canvasは背景に、HTMLは前面に。</h1>
               <p>
                 3D表現はReact Three Fiberに任せ、見出しや本文は通常のDOMとして
                 読みやすく配置します。
@@ -227,7 +226,6 @@ code:
 
           <div className="r3f-content">
             <p className="r3f-label">R3F BACKGROUND</p>
-            <h1>Canvasは背景に、HTMLは前面に。</h1>
             <p>
               3D表現はReact Three Fiberに任せ、見出しや本文は通常のDOMとして
               読みやすく配置します。
@@ -324,7 +322,6 @@ code:
         padding: 34px 26px;
       }
     }
-
 ---
 
 ## 📝 はじめに
@@ -344,10 +341,10 @@ R3FのCanvasを使うと、通常のDOMだけでは作りにくい奥行きや�
 
 作るのは、1つのセクションの背面にR3FのCanvasを置き、その上に通常のHTMLテキストを重ねる小さな部品です。
 
-* **主役:** R3F Canvasを背景レイヤーとして配置する構造
-* **トリガー:** 初回表示後の常時描画
-* **対象要素:** 背景Canvas、前面のHTML見出しと本文
-* **再利用先:** Hero背景、セクション背景、キャンペーン導入、記事ページのキービジュアル
+- **主役:** R3F Canvasを背景レイヤーとして配置する構造
+- **トリガー:** 初回表示後の常時描画
+- **対象要素:** 背景Canvas、前面のHTML見出しと本文
+- **再利用先:** Hero背景、セクション背景、キャンペーン導入、記事ページのキービジュアル
 
 ここでは3Dオブジェクトの完成度を上げることは目的にしません。背景には簡単な`torusKnotGeometry`を1つ置くだけにして、読み手が「どこがCanvasで、どこがHTMLか」を追いやすい構成にしています。
 
@@ -355,13 +352,13 @@ R3FのCanvasを使うと、通常のDOMだけでは作りにくい奥行きや�
 
 このデモは、3つの役割に分けます。
 
-* **Demo**
+- **Demo**
   セクション全体を持つ親コンポーネントです。背景Canvasと前面DOMを並べるだけにして、細かいWebGL処理は直接書きません。
 
-* **CanvasBackground**
+- **CanvasBackground**
   Canvasを包む背景レイヤーです。`aria-hidden="true"`を付けて、装飾背景として扱います。ここにカメラ、ライト、背景色をまとめます。
 
-* **BackgroundShape**
+- **BackgroundShape**
   Canvas内の3Dオブジェクトだけを担当します。`useFrame`で少しだけ回転させますが、DOMやCSSのことは知りません。
 
 HTMLテキストをCanvas内に入れない理由は、情報表示としての扱いやすさを保つためです。見出しや本文、リンクは通常のDOMにしておくと、フォント、行間、折り返し、リンクのクリック、SEO、スクリーンリーダー対応をいつものCSSとHTMLの流れで調整できます。
@@ -386,12 +383,12 @@ R3F側は3D表現だけに絞ります。`Canvas`は描画面、`BackgroundShape
 
 調整ダイヤルは、次の値から触ると印象を変えやすいです。
 
-* **セクションの高さ:** `.r3f-section`の`min-height`。Hero寄りなら`560px`以上、記事中の区切りなら`320px`前後。
-* **Canvasの前後関係:** `.r3f-background-layer`の`z-index: 0`と`.r3f-content`の`z-index: 1`。背景と本文の順序を固定するための基本セット。
-* **操作の受け渡し:** `.r3f-background-layer`の`pointer-events`。装飾背景なら`none`、Canvas操作が必要なら`auto`。
-* **3Dの存在感:** `SCENE_CONFIG.meshColor`、`BackgroundShape`の`scale`、ライトの`intensity`。本文より目立ちすぎる場合は、スケールやライトを下げます。
-* **動きの強さ:** `SCENE_CONFIG.rotationSpeed`。背景用途では`0.1〜0.25`程度に抑えると、前面の文章を読む邪魔になりにくいです。
-* **画質と負荷:** `Canvas`の`dpr={[1, 1.5]}`。高精細にしすぎると負荷が上がるので、背景では上限を控えめにします。
+- **セクションの高さ:** `.r3f-section`の`min-height`。Hero寄りなら`560px`以上、記事中の区切りなら`320px`前後。
+- **Canvasの前後関係:** `.r3f-background-layer`の`z-index: 0`と`.r3f-content`の`z-index: 1`。背景と本文の順序を固定するための基本セット。
+- **操作の受け渡し:** `.r3f-background-layer`の`pointer-events`。装飾背景なら`none`、Canvas操作が必要なら`auto`。
+- **3Dの存在感:** `SCENE_CONFIG.meshColor`、`BackgroundShape`の`scale`、ライトの`intensity`。本文より目立ちすぎる場合は、スケールやライトを下げます。
+- **動きの強さ:** `SCENE_CONFIG.rotationSpeed`。背景用途では`0.1〜0.25`程度に抑えると、前面の文章を読む邪魔になりにくいです。
+- **画質と負荷:** `Canvas`の`dpr={[1, 1.5]}`。高精細にしすぎると負荷が上がるので、背景では上限を控えめにします。
 
 Canvasを背景に分けると、HTML側の文章量が増えても3Dシーンを直さずに済みます。反対に、背景のメッシュやライトを変更しても、前面DOMの情報設計には触れずに済みます。この分離が、実務で使い回しやすい一番の理由です。
 
@@ -401,12 +398,12 @@ Canvasを背景に分けると、HTML側の文章量が増えても3Dシーン�
 
 その後で、画面幅に応じてメッシュ位置を変える、Canvasの背景色をテーマ変数に合わせる、前面DOMにCTAを足す、といった順番で拡張します。shader、画像テクスチャ、マウス追従、スクロール連動は魅力的ですが、まずはCanvasが背景として安全に配置されていることを確認してから足す方が、構造が崩れにくくなります。
 
-### _animation-inventory.md に追記する台帳メモ
+### \_animation-inventory.md に追記する台帳メモ
 
 #### r3f-canvas-background-basic
 
-* 主役: Canvas背景
-* 軸: R3F CanvasをDOMコンテンツの背面レイヤーとして配置する
-* トリガー: 初回表示後の常時描画
-* 見せ場: 1つのセクション内でCanvas背景とHTML本文を重ねる構造
-* 次回避ける: 背景Canvasと前面DOMのz-index / pointer-events整理だけを主役にする構成
+- 主役: Canvas背景
+- 軸: R3F CanvasをDOMコンテンツの背面レイヤーとして配置する
+- トリガー: 初回表示後の常時描画
+- 見せ場: 1つのセクション内でCanvas背景とHTML本文を重ねる構造
+- 次回避ける: 背景Canvasと前面DOMのz-index / pointer-events整理だけを主役にする構成
