@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
+import { callResponses as requestResponses } from './lib/openai-responses.mjs';
 
 const ROOT = process.cwd();
 const ARTICLES_DIR = path.join(ROOT, 'content', 'articles');
@@ -11,6 +12,7 @@ const RESEARCH_MODEL = process.env.OPENAI_RESEARCH_MODEL || MODEL;
 const API_KEY = process.env.OPENAI_API_KEY;
 const MAX_REVISIONS = 2;
 const QUALITY_THRESHOLD = 84;
+const REQUEST_TIMEOUT_MS = 120_000;
 
 if (!API_KEY) {
   throw new Error('OPENAI_API_KEY is not set.');
@@ -41,10 +43,7 @@ const TECHNIQUE_ROTATION = [
   'immersive navigation',
 ];
 
-const REFERENCE_DOMAINS = [
-  'awwwards.com',
-  'cssdesignawards.com',
-];
+const REFERENCE_DOMAINS = ['awwwards.com', 'cssdesignawards.com'];
 
 function tokyoDateParts() {
   const parts = new Intl.DateTimeFormat('en-CA', {
@@ -115,47 +114,12 @@ function outputText(response) {
 }
 
 async function callResponses(body) {
-  const maxAttempts = 2;
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    let response;
-
-    try {
-      response = await fetch('https://api.openai.com/v1/responses', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-    } catch (error) {
-      if (attempt === maxAttempts) throw error;
-
-      console.warn(`OpenAI request failed; retrying once (${error.message}).`);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      continue;
-    }
-
-    if (!response.ok) {
-      const detail = await response.text();
-      const isRetryable =
-        response.status === 408 ||
-        response.status === 409 ||
-        response.status === 429 ||
-        response.status >= 500;
-
-      if (!isRetryable || attempt === maxAttempts) {
-        throw new Error(`OpenAI API error ${response.status}: ${detail}`);
-      }
-
-      console.warn(`OpenAI API returned ${response.status}; retrying once.`);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      continue;
-    }
-
-    return response.json();
-  }
+  const label = body.text?.format?.name || 'reference_research';
+  return requestResponses(body, {
+    apiKey: API_KEY,
+    label,
+    timeoutMs: REQUEST_TIMEOUT_MS,
+  });
 }
 
 function yamlString(value) {
@@ -488,7 +452,9 @@ function ensureSafeExperiment(article) {
   }
 
   if (article.javascript.length < 2500) {
-    throw new Error('JavaScript is too small for a production-grade graphics study.');
+    throw new Error(
+      'JavaScript is too small for a production-grade graphics study.'
+    );
   }
 
   const forbidden = [
@@ -508,8 +474,9 @@ function ensureSafeExperiment(article) {
     }
   }
 
-  const imports = [...article.javascript.matchAll(/from\s+['"]([^'"]+)['"]/g)]
-    .map(match => match[1]);
+  const imports = [
+    ...article.javascript.matchAll(/from\s+['"]([^'"]+)['"]/g),
+  ].map(match => match[1]);
 
   for (const source of imports) {
     if (
@@ -535,7 +502,7 @@ categoryDescription: ${yamlString(article.category_description)}
 tags:
 ${tags.map(tag => `  - ${yamlString(tag)}`).join('\n')}
 date: ${yamlString(japaneseDate(meta.today))}
-publishedAt: ${meta.today.iso}
+publishedAt: ${yamlString(meta.today.iso)}
 readTime: ${yamlString('10分')}
 viewer: playground
 thumbnail: runtime
@@ -588,7 +555,9 @@ if (dayNumber > SERIES_LENGTH) {
 }
 
 const existingToday = fs.existsSync(ARTICLES_DIR)
-  ? fs.readdirSync(ARTICLES_DIR).find(name => name.startsWith(`daily-${today.iso}-`))
+  ? fs
+      .readdirSync(ARTICLES_DIR)
+      .find(name => name.startsWith(`daily-${today.iso}-`))
   : null;
 
 if (existingToday) {
@@ -598,7 +567,8 @@ if (existingToday) {
 
 const history = readHistory();
 const focus = FOCUS_ROTATION[(dayNumber - 1) % FOCUS_ROTATION.length];
-const technique = TECHNIQUE_ROTATION[(dayNumber - 1) % TECHNIQUE_ROTATION.length];
+const technique =
+  TECHNIQUE_ROTATION[(dayNumber - 1) % TECHNIQUE_ROTATION.length];
 
 console.log(`Researching award reference for Day ${dayNumber}...`);
 const researchMemo = await researchReference({

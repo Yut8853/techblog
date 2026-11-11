@@ -16,7 +16,9 @@ concurrency:
 jobs:
   generate-test-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Up to 7 calls x (2 attempts x 120s + 2s backoff) = 28m14s,
+    # plus dependency installation, validation and build.
+    timeout-minutes: 35
 
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -42,7 +44,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check generator syntax
-        run: node --check scripts/generate-daily-experiment.mjs
+        run: |
+          node --check scripts/generate-daily-experiment.mjs
+          node --test scripts/lib/openai-responses.test.mjs
 
       - name: Generate today's experiment
         run: node scripts/generate-daily-experiment.mjs

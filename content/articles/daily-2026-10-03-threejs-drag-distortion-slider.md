@@ -13,7 +13,7 @@ tags:
   - "ディストーション"
   - "Daily Lab"
 date: "2026年10月3日"
-publishedAt: 2026-10-03
+publishedAt: "2026-10-03"
 readTime: "10分"
 viewer: playground
 thumbnail: runtime
