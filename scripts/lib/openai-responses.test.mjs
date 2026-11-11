@@ -55,9 +55,47 @@ test('generation deadline cancels the pending response without resubmitting', as
     },
   }), /generation deadline exceeded/);
   assert.equal(clock, 100);
-  assert.equal(requests.length, 2);
-  assert.ok(requests[1].url.endsWith('/resp_test/cancel'));
+  assert.equal(requests.length, 3);
+  assert.equal(requests[1].method, 'GET');
+  assert.ok(requests[2].url.endsWith('/resp_test/cancel'));
 });
+
+for (const scenario of ['final-poll', 'cancel-result', 'cancel-race', 'failed', 'incomplete', 'unreachable']) {
+  test(`deadline recovery: ${scenario}`, async () => {
+    let clock = 0;
+    const requests = [];
+    const completed = { id: 'resp_test', status: 'completed', output: ['preserved article'] };
+    const run = backgroundResponse({}, {
+      ...defaults,
+      generationTimeoutMs: 100,
+      now: () => clock,
+      sleep: async ms => { clock += ms; },
+      fetchImpl: async (url, options) => {
+        requests.push({ url, ...options });
+        if (requests.length === 1) return Response.json({ id: 'resp_test', status: 'in_progress' });
+        if (scenario === 'unreachable') throw new TypeError('fetch failed');
+        if (scenario === 'failed' || scenario === 'incomplete') {
+          return Response.json({ id: 'resp_test', status: scenario });
+        }
+        if (scenario === 'final-poll') return Response.json(completed);
+        if (url.endsWith('/cancel')) {
+          if (scenario === 'cancel-result') return Response.json(completed);
+          return new Response('Cannot cancel a completed response.', { status: 400 });
+        }
+        return Response.json(requests.length === 2 ? { id: 'resp_test', status: 'in_progress' } : completed);
+      },
+    });
+    if (['failed', 'incomplete', 'unreachable'].includes(scenario)) {
+      await assert.rejects(run, /generation deadline exceeded/);
+    } else {
+      assert.deepEqual(await run, completed);
+    }
+    const expectedCount = { 'final-poll': 2, 'cancel-result': 3, 'cancel-race': 4, failed: 2, incomplete: 2, unreachable: 4 };
+    assert.equal(requests.length, expectedCount[scenario]);
+    assert.equal(requests.filter(r => r.url === 'https://api.openai.com/v1/responses').length, 1);
+    assert.equal(clock, 100);
+  });
+}
 
 test('terminal failures and incomplete output are rejected', async () => {
   for (const status of ['failed', 'cancelled', 'incomplete']) {

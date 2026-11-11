@@ -38,18 +38,43 @@ export async function callResponses(body, {
     return response;
   } catch (error) {
     if (pending()) {
+      // The last poll can be stale when the deadline expires. Give cleanup
+      // requests their own short deadlines, never restart the generation.
+      const recoveryOptions = {
+        ...requestOptions,
+        deadline: Infinity,
+        timeoutMs: 10_000,
+        maxAttempts: 1,
+      };
+      const retrieveLatest = async () => {
+        try {
+          response = await requestJson(undefined, { ...recoveryOptions, url, method: 'GET' });
+        } catch (retrieveError) {
+          logger.warn(`[${options.label}] could not retrieve final state for ${id}: ${retrieveError.message}`);
+        }
+      };
+      const recovered = () => {
+        logger.log(`[${options.label}] recovered completed response ${id} after ${((now() - started) / 1000).toFixed(1)}s`);
+        return response;
+      };
+
+      await retrieveLatest();
+      if (response.status === 'completed') return recovered();
+      if (!pending()) throw error;
+
       try {
-        await requestJson(undefined, {
-          ...requestOptions,
+        response = await requestJson(undefined, {
+          ...recoveryOptions,
           url: `${url}/cancel`,
           method: 'POST',
-          deadline: Infinity,
-          timeoutMs: 10_000,
-          maxAttempts: 1,
         });
       } catch (cancelError) {
         logger.warn(`[${options.label}] could not cancel ${id}: ${cancelError.message}`);
+        // Completion may race cancellation (including HTTP 400 "completed").
+        // Only a retrieved completed response can turn this into success.
+        await retrieveLatest();
       }
+      if (response.status === 'completed') return recovered();
     }
     throw error;
   }
