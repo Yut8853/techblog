@@ -5,6 +5,7 @@ import { callResponses as requestResponses } from './lib/openai-responses.mjs';
 
 const ROOT = process.cwd();
 const ARTICLES_DIR = path.join(ROOT, 'content', 'articles');
+const REPORTS_DIR = path.join(ROOT, 'artifacts', 'daily-lab');
 const SERIES_START = '2026-10-03';
 const SERIES_LENGTH = 365;
 const MODEL = process.env.OPENAI_MODEL || 'gpt-6-astra';
@@ -44,6 +45,18 @@ const TECHNIQUE_ROTATION = [
 ];
 
 const REFERENCE_DOMAINS = ['awwwards.com', 'cssdesignawards.com'];
+
+function saveDiagnostic(name, value) {
+  fs.mkdirSync(REPORTS_DIR, { recursive: true });
+  fs.writeFileSync(path.join(REPORTS_DIR, name), JSON.stringify(value, null, 2), 'utf8');
+}
+
+function reportCritique(critique, revision) {
+  saveDiagnostic(`review-${revision}.json`, critique);
+  console.log(`Review ${revision}: ${critique.score}/100; pass=${critique.pass}`);
+  for (const issue of critique.critical_issues) console.log(`- ${issue}`);
+  console.log(`Revision brief: ${critique.revision_brief}`);
+}
 
 function tokyoDateParts() {
   const parts = new Intl.DateTimeFormat('en-CA', {
@@ -308,6 +321,9 @@ async function generateArticle({
     '- devicePixelRatio上限、resize、reduced-motionまたは非対応環境へのフォールバックを考慮すること。',
     '- fallback要素にhidden属性を使う場合、CSSで[hidden] { display: none !important; }を必ず保証し、通常時に誤表示しないこと。',
     '- 実務で調整するパラメータがコードから分かること。',
+    '- History APIを使う場合は毎フレームやscrollイベントごとに更新せず、章の確定や明示的操作時だけ更新すること。',
+    '- 章や本文の切り替えには境界付近の往復でちらつかない安定化と遷移を設け、戻る操作の状態整合性を保つこと。',
+    '- 実施していないブラウザ・実機・性能検証を実施済みと記載しないこと。未検証の項目は確認手順として明示すること。',
     '- 外部ブランド名、ロゴ、原文コピー、受賞サイト固有の画像・動画・3Dモデルは使用しないこと。',
     '- 参考元と同一レイアウトをピクセル単位でコピーしないこと。',
     '- 画像が必要ならCSS/SVG/CanvasTexture等でオリジナルのビジュアルを生成すること。',
@@ -373,13 +389,18 @@ async function generateArticle({
   return JSON.parse(outputText(response));
 }
 
-async function critiqueArticle({ article, researchMemo, focus, technique }) {
+async function critiqueArticle({ article, researchMemo, focus, technique, previousCritique = null }) {
   const response = await callResponses({
     model: MODEL,
     instructions: [
       'あなたは受託制作会社のCreative Director兼Lead Creative Developerです。',
       '提出されたデモが実案件の提案・実装に耐えるか厳しくレビューしてください。',
       '教材として動くかではなく、実務品質かどうかを判定します。',
+      'これは提供されたHTML/CSS/JavaScriptと記事の静的レビューです。ブラウザ実行結果、スクリーンショット、実機計測値は提供されていません。',
+      '描画や性能の実測結果を推測・捏造しないこと。実行確認が必要な事項は各評価欄に「要実機確認」として分け、検証記録が無いこと自体を減点や不合格の理由にしないこと。',
+      'コードから特定できる描画不成立、状態遷移、パフォーマンス、アクセシビリティの欠陥は厳しく評価すること。未検証であることと、コード上の欠陥を混同しないこと。',
+      'critical_issuesには該当する関数・セレクタ・式と、問題が起きる条件を示すこと。revision_briefには生成担当がコードや記事の変更で解消できる修正指示を書くこと。スクリーンショットや実機検証記録の提出を修正条件にしないこと。',
+      '前回レビューがある場合は各指摘が解消されたかコードで確認し、残存する欠陥と新たに発見した欠陥を明記すること。',
       '',
       '採点観点:',
       '- Visual composition: 余白、タイポ、色、階層、画面密度',
@@ -393,6 +414,7 @@ async function critiqueArticle({ article, researchMemo, focus, technique }) {
     input: [
       `Focus: ${focus}`,
       `Technique: ${technique}`,
+      `Previous review: ${JSON.stringify(previousCritique)}`,
       '',
       'Reference research:',
       researchMemo,
@@ -577,6 +599,7 @@ const researchMemo = await researchReference({
   dayNumber,
   history,
 });
+saveDiagnostic('research.json', { dayNumber, date: today.iso, focus, technique, researchMemo });
 
 let article = await generateArticle({
   today,
@@ -587,6 +610,7 @@ let article = await generateArticle({
   researchMemo,
 });
 
+saveDiagnostic('candidate-0.json', article);
 ensureSafeExperiment(article);
 
 let critique = await critiqueArticle({
@@ -595,6 +619,7 @@ let critique = await critiqueArticle({
   focus,
   technique,
 });
+reportCritique(critique, 0);
 
 for (
   let revision = 0;
@@ -613,10 +638,11 @@ for (
     technique,
     history,
     researchMemo,
-    revisionBrief: critique.revision_brief,
+    revisionBrief: JSON.stringify(critique, null, 2),
     previousArticle: article,
   });
 
+  saveDiagnostic(`candidate-${revision + 1}.json`, article);
   ensureSafeExperiment(article);
 
   critique = await critiqueArticle({
@@ -624,7 +650,9 @@ for (
     researchMemo,
     focus,
     technique,
+    previousCritique: critique,
   });
+  reportCritique(critique, revision + 1);
 }
 
 if (!critique.pass || critique.score < QUALITY_THRESHOLD) {

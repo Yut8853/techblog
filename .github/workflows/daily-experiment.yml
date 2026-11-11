@@ -47,9 +47,19 @@ jobs:
         run: |
           node --check scripts/generate-daily-experiment.mjs
           node --test scripts/lib/openai-responses.test.mjs
+          node --test scripts/generate-daily-experiment.test.mjs
 
       - name: Generate today's experiment
         run: node scripts/generate-daily-experiment.mjs
+
+      - name: Save generation candidates and reviews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-lab-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/daily-lab/
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Validate content
         run: pnpm test:content

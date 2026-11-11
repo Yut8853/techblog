@@ -8,7 +8,7 @@
 2. OpenAI API のWeb Searchで Awwwards / CSS Design Awards から参考事例を1件調査
 3. 参考サイトのブランドや素材をコピーせず、インタラクション原理とモーション設計を抽出
 4. AIが実務品質のHTML/CSS/JavaScriptデモと記事を生成
-5. 別のAIレビューで visual / interaction / technical / production readiness を採点
+5. 別のAIによる静的コードレビューで visual / interaction / technical / production readiness を採点（ブラウザ描画・実機性能の検証は含まない）
 6. 84点未満なら最大2回まで自動で作り直す
 7. コンテンツ検証 + Daily Lab専用検証 + Next.js production build
 8. すべて成功した場合のみ main にcommit/push
@@ -90,3 +90,9 @@ playground上で直接編集し、Runで再実行できます。
 
 既存記事ファイルは削除しません。
 公開側では2026-10-03以降の記事だけを表示する設定にするため、過去記事はGit履歴・ファイルとして残したままDaily Labをゼロから開始できます。
+
+## 品質レビューで停止した場合
+
+84点以上かつレビューのpassがtrueになるまで公開しません。修正担当には評価全体を渡し、レビュー担当には前回の評価も渡します。コードから特定できる欠陥と実機で確認が必要な項目を分けて評価します。静的レビューへの合格は実ブラウザでの動作や性能を保証しません。
+
+Actions実行詳細のArtifactsから `daily-lab-diagnostics-<run_id>-<run_attempt>` を取得できます。調査結果、初稿と各修正版の `candidate-N.json`（HTML/CSS/JavaScriptを含む）、各回の `review-N.json` を成功・失敗にかかわらず14日間保存します。候補は公開記事ディレクトリに置かず、品質基準に達した記事のみ公開します。
