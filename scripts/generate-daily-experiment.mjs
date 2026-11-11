@@ -115,21 +115,47 @@ function outputText(response) {
 }
 
 async function callResponses(body) {
-  const response = await fetch('https://api.openai.com/v1/responses', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
+  const maxAttempts = 2;
 
-  if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`OpenAI API error ${response.status}: ${detail}`);
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    let response;
+
+    try {
+      response = await fetch('https://api.openai.com/v1/responses', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+    } catch (error) {
+      if (attempt === maxAttempts) throw error;
+
+      console.warn(`OpenAI request failed; retrying once (${error.message}).`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      continue;
+    }
+
+    if (!response.ok) {
+      const detail = await response.text();
+      const isRetryable =
+        response.status === 408 ||
+        response.status === 409 ||
+        response.status === 429 ||
+        response.status >= 500;
+
+      if (!isRetryable || attempt === maxAttempts) {
+        throw new Error(`OpenAI API error ${response.status}: ${detail}`);
+      }
+
+      console.warn(`OpenAI API returned ${response.status}; retrying once.`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      continue;
+    }
+
+    return response.json();
   }
-
-  return response.json();
 }
 
 function yamlString(value) {
