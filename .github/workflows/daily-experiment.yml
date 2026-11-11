@@ -16,9 +16,9 @@ concurrency:
 jobs:
   generate-test-publish:
     runs-on: ubuntu-latest
-    # Up to 7 calls x (2 attempts x 120s + 2s backoff) = 28m14s,
-    # plus dependency installation, validation and build.
-    timeout-minutes: 35
+    # Up to 7 background generations x 10 minutes, plus cancellation,
+    # dependency installation, validation and build.
+    timeout-minutes: 80
 
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
