@@ -5,6 +5,7 @@ import { CodePlayground } from '@/components/code-playground';
 import { ExpressionTypes } from '@/components/expression-types';
 import { RelatedArticles } from '@/components/related-articles';
 import { ArticleHeader } from '@/components/article-header';
+import { SchoolCta } from '@/components/school-cta';
 import { getLatestArticles } from '@/lib/articles';
 
 const hiddenHomeSlugs = ['particle-glass-background-shift'];
@@ -93,6 +94,8 @@ export default function Home() {
             <div className="mt-8">
               <CodePlayground code={article.code} files={article.files} />
             </div>
+
+            <SchoolCta articleSlug={article.slug} placement="home-feature" />
 
             <ExpressionTypes />
 

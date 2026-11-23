@@ -9,6 +9,7 @@ import { CodePlayground } from '@/components/code-playground';
 import { ExpressionTypes } from '@/components/expression-types';
 import { RelatedArticles } from '@/components/related-articles';
 import { ArticleHeader } from '@/components/article-header';
+import { SchoolCta } from '@/components/school-cta';
 import { Badge } from '@/components/ui/badge';
 import { ChevronRight, ExternalLink, Home } from 'lucide-react';
 import { getArticleBySlug } from '@/lib/articles';
@@ -159,6 +160,8 @@ export default async function ArticleDetailPage({
                 </ReactMarkdown>
               </article>
             )}
+
+            <SchoolCta articleSlug={article.slug} />
 
             {/* Tags */}
             <div className="mt-12 pt-8 border-t">
